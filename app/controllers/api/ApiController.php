@@ -33,4 +33,12 @@ class ApiController extends BaseController {
 		return array('samples' => $samples);
 	}
 
+	public function postSamples() {
+		$inputs = Input::all();
+		foreach ($inputs['samples'] as $sample) {
+			$sample = UnprocessedSample::create($sample);
+		}
+		return array('status' => 'success');
+	}
+
 }
