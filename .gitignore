@@ -1,0 +1,12 @@
+/bootstrap/compiled.php
+
+composer.phar
+composer.lock
+.env.*.php
+.env.php
+.env
+.DS_Store
+._*
+Thumbs.db
+__MACOSX/
+error_log
