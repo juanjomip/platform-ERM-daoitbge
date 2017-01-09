@@ -28,7 +28,7 @@ class ApiController extends BaseController {
 		foreach ($samples as $sample) {
 			$sample->value = (int) $sample->value;
 			$sample->lat = (float) $sample->lat;
-			$sample->lng = (float) $sample->lat;
+			$sample->lng = (float) $sample->lng;
 		}
 		return array('samples' => $samples);
 	}

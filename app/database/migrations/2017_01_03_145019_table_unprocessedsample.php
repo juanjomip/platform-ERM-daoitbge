@@ -18,6 +18,7 @@ class TableUnprocessedsample extends Migration {
             $table->integer('value');
             $table->decimal('lat', 10, 7);
             $table->decimal('lng', 10, 7);
+            $table->datetime('datetime')->nullable()->default(null);
         });
 
         DB::table('unprocessed_sample')->insert(

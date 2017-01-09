@@ -1,7 +1,9 @@
 'use strict';
 
 app.controller('MainCtrl', function ($rootScope, $scope, $http) {
-    console.log('main-controller');  
+    
+    $scope.samples = [];
+
     var santiago = new google.maps.LatLng(-33.465, 289.35)
     $rootScope.map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
@@ -17,8 +19,9 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http) {
     // get all samples from backend.
     $scope.getSamples = function () {
         $http.get('/api/samples')
-            .then(function(response) {           	
-                $scope.createMarkers(response.data.samples);          
+            .then(function(response) {                 
+                $scope.samples = response.data.samples;
+                $scope.createMarkers($scope.samples);          
             },
             function error(response) {
                 console.log(response);
@@ -30,12 +33,12 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http) {
     $scope.createMarkers = function(samples) {        
         for (var i = 0; i < samples.length; i++) {
             $scope.createMarker(samples[i], $rootScope.map);
-        }    	
+        }        
     }
 
     // create marker from a sample.
     $scope.createMarker = function(sample, map) {          
-        var position = new google.maps.LatLng(-33.465, 289.35)
+        var position = new google.maps.LatLng(sample.lat, sample.lng)
         var marker = new google.maps.Marker({
         position: position,
             map: map,            
@@ -48,8 +51,14 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http) {
         marker.addListener('click', function() {
             infowindow.open(map, marker);
         });
-    }
+
+        marker.infowindow = infowindow;        
+        sample.marker = marker;       
+    } 
+
+
 
     $scope.getSamples();
+
 });
 
