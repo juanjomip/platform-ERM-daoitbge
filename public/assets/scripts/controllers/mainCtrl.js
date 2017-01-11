@@ -8,12 +8,12 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http) {
     $rootScope.map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
         center: santiago,
-        panControl: false,
-        zoomControl: false,
-        navigationControl: false,
-        mapTypeControl: false,
-        scaleControl: false,
-        draggable: false
+        panControl: true,
+        zoomControl: true,
+        navigationControl: true,
+        mapTypeControl: true,
+        scaleControl: true,
+        draggable: true
     });
 
     // get all samples from backend.
@@ -21,7 +21,8 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http) {
         $http.get('/api/samples')
             .then(function(response) {                 
                 $scope.samples = response.data.samples;
-                $scope.createMarkers($scope.samples);          
+                $scope.createMarkers($scope.samples); 
+                console.log(JSON.stringify($scope.samples));        
             },
             function error(response) {
                 console.log(response);
