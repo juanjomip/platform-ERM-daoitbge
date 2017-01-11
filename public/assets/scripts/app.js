@@ -17,7 +17,8 @@ var app = angular
         'ngSanitize',
         'ngTouch',
         'ui.bootstrap',
-        'mgcrea.ngStrap'                        
+        'mgcrea.ngStrap',
+        'ng-fusioncharts'                        
     ]);
 
 
@@ -26,7 +27,18 @@ app.run(function ($rootScope, $window, $http, $modal) {
 
 
 app.config(function ($stateProvider, $urlRouterProvider, $locationProvider) {    
-    $locationProvider.html5Mode(true);
+    $locationProvider.html5Mode(true);    
+    $stateProvider   
+    .state('main-map', {
+        url: '/main-map',
+        templateUrl: '/views/main-map.html',
+        controller: 'mainMapCtrl'
+    })
+    .state('charts', {
+        url: '/charts',
+        templateUrl: '/views/charts.html',
+        controller: 'chartsCtrl'
+    })    
 });
 
 

@@ -51,6 +51,10 @@ App::error(function(Exception $exception, $code)
 	Log::error($exception);
 });
 
+App::missing(function () {
+    return Redirect::to('/');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Maintenance Mode Handler

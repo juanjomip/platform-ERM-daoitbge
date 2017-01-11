@@ -12,12 +12,21 @@
 	
 </head>
 <body ng-app="app" ng-controller="MainCtrl">
-	<div class="welcome">		
+	<li ui-sref-active="active">
+        <a ui-sref="main-map" ><i></i><span >Main Map</span></a>
+    </li>
+    <li ui-sref-active="active">
+        <a ui-sref="charts" ><i></i><span >Charts</span></a>
+    </li>
+
+    <div class="welcome">		
 		<h1>Platform-ERM-Prototype</h1>
-		<div id="map"></div>
+		
 	</div>
 
-	<script src="https://maps.googleapis.com/maps/api/js?extension=.js"></script>
+    <div ui-view></div>
+
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnpCoCt1diZedDOsnoEdX4tGYZ8nCnQUI&extension=.js"></script>
 	<script src="/bower_components/jquery/dist/jquery.min.js"></script>
     <script src="/bower_components/angular/angular.min.js"></script>
     <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
@@ -30,8 +39,13 @@
     <script src="/bower_components/angular-touch/angular-touch.min.js"></script>
     <script src="/bower_components/angular-route/angular-route.min.js"></script>
     <script src="/bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="/vendor/fusioncharts-suite-xt/js/fusioncharts.js"></script>
+    <script src="/vendor/angular-fusioncharts.min.js"></script>
 
     <script src="assets/scripts/app.js"></script>
     <script src="assets/scripts/controllers/mainCtrl.js"></script>
+    <script src="assets/scripts/controllers/mainMapCtrl.js"></script>
+    <script src="assets/scripts/controllers/chartsCtrl.js"></script>
+
 </body>
 </html>
