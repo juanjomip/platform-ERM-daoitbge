@@ -22,7 +22,9 @@ app.controller('MainCtrl', function ($rootScope, $scope, $http) {
             .then(function(response) {                 
                 $scope.samples = response.data.samples;
                 $scope.createMarkers($scope.samples); 
-                console.log(JSON.stringify($scope.samples));        
+                for (var i = 0; $scope.samples.length > i; i++) {
+                   console.log($scope.samples[i]);      
+                }  
             },
             function error(response) {
                 console.log(response);
