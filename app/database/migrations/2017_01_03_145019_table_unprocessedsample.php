@@ -50,6 +50,23 @@ class TableUnprocessedsample extends Migration {
         		)
         	)
         );
+
+        Schema::create('cell', function ($table) {
+            $table->engine = 'InnoDB';
+            $table->increments('id');
+            $table->decimal('lat_index', 10,7);
+            $table->decimal('lng_index', 10,7);
+            $table->decimal('bottom_left_lat', 10,7);
+            $table->decimal('bottom_left_lng', 10,7);
+            $table->decimal('top_left_lat', 10,7);
+            $table->decimal('top_left_lng', 10,7);
+            $table->decimal('top_right_lat', 10,7);
+            $table->decimal('top_right_lng', 10,7);
+            $table->decimal('bottom_left_lat', 10,7);
+            $table->decimal('bottom_left_lng', 10,7);
+            $table->integer('lat_index');
+            $table->integer('lng_index');
+        });
 	}
 
 	/**
@@ -59,6 +76,7 @@ class TableUnprocessedsample extends Migration {
 	 */
 	public function down()
 	{
+        Schema::drop('cell');
 		Schema::drop('unprocessed_sample');
 	}
 
