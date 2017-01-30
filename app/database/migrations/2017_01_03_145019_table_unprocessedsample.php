@@ -26,8 +26,8 @@ class TableUnprocessedsample extends Migration {
         Schema::create('cell', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->decimal('lat_index', 10,7);
-            $table->decimal('lng_index', 10,7);
+            $table->integer('lat_index');
+            $table->integer('lng_index');
             $table->decimal('bottom_left_lat', 10,7);
             $table->decimal('bottom_left_lng', 10,7);
             $table->decimal('top_left_lat', 10,7);
@@ -37,6 +37,22 @@ class TableUnprocessedsample extends Migration {
             $table->decimal('bottom_right_lat', 10,7);
             $table->decimal('bottom_right_lng', 10,7);
             
+        });
+
+        Schema::create('commune', function ($table) {
+            $table->engine = 'InnoDB';
+            $table->increments('id');
+            $table->varchar('nombre');
+            $table->integer('center_lat');
+            $table->integer('center_lng');            
+        });
+
+        Schema::create('commune_path', function ($table) {
+            $table->engine = 'InnoDB';
+            $table->increments('id');
+            $table->integer('commune_id');            
+            $table->decimal('lat', 10,7);
+            $table->decimal('lng', 10,7);          
         });
 	}
 

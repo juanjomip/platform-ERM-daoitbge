@@ -42,8 +42,12 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     $scope.createMarker = function(sample, map) {          
         var position = new google.maps.LatLng(sample.lat, sample.lng)
         var marker = new google.maps.Marker({
-        position: position,
-            map: map,            
+        position: position,            
+            map: map,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 4
+            },            
         });
 
         var infowindow = new google.maps.InfoWindow({
@@ -83,10 +87,10 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         var polygon = new google.maps.Polygon({
             paths: cellPath,
             strokeColor: '#FF0000',
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
+            strokeOpacity: 0.2,
+            strokeWeight: 0,
             fillColor: '#FF0000',
-            fillOpacity: 0.35
+            fillOpacity: 0.2
         });
         polygon.setMap(map);
         cell.polygon = polygon;
