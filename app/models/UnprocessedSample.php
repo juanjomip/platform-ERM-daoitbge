@@ -9,8 +9,8 @@ class UNprocessedSample extends Eloquent {
 	protected $fillable = array('lat', 'lng', 'value', 'datetime');
 
 	public function assignCell(){
-		$lat_index = round($this->lat/Cell::SIDE_SIZE);
-		$lng_index = round($this->lng/Cell::SIDE_SIZE);		
+		$lat_index = floor($this->lat/Cell::SIDE_SIZE);
+		$lng_index = floor($this->lng/Cell::SIDE_SIZE);		
 		if($cell = Cell::where('lat_index', $lat_index)->where('lng_index', $lng_index)->first()) {
 			$this->cell_code = $cell->id;
 			$this->save();

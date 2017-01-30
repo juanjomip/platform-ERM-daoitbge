@@ -2,7 +2,7 @@
 
 app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     
-     $scope.samples = [];
+    $scope.samples = [];
 
     var santiago = new google.maps.LatLng(-33.465, 289.35)
     $rootScope.map = new google.maps.Map(document.getElementById('map'), {
@@ -21,10 +21,9 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         $http.get('/api/samples')
             .then(function(response) {                 
                 $scope.samples = response.data.samples;
-                $scope.createMarkers($scope.samples); 
-                for (var i = 0; $scope.samples.length > i; i++) {
-                   console.log($scope.samples[i]);      
-                }  
+                $scope.cells = response.data.cells;
+                $scope.drawCells($scope.cells);
+                $scope.createMarkers($scope.samples);                
             },
             function error(response) {
                 console.log(response);
@@ -37,7 +36,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         for (var i = 0; i < samples.length; i++) {
             $scope.createMarker(samples[i], $rootScope.map);
         }        
-    }
+    }    
 
     // create marker from a sample.
     $scope.createMarker = function(sample, map) {          
@@ -59,6 +58,39 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         sample.marker = marker;       
     } 
 
+    // draw cells.
+    $scope.drawCells = function(cells) {
+        for (var i = 0; i < cells.length; i++) {
+            $scope.drawCell(cells[i], $rootScope.map);
+        } 
+    }
+
+    // draw cell.
+    $scope.drawCell = function(cell, map) {
+
+        console.log(cell);
+        
+        var cellPath = [
+            {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng},
+            {lat: cell.top_left_lat, lng: cell.top_left_lng},
+            {lat: cell.top_right_lat, lng: cell.top_right_lng},
+            {lat: cell.bottom_right_lat, lng: cell.bottom_right_lng},
+            {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng}
+        ];
+
+        console.log(cellPath);
+
+        var polygon = new google.maps.Polygon({
+            paths: cellPath,
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35
+        });
+        polygon.setMap(map);
+        cell.polygon = polygon;
+    }
 
 
     $scope.getSamples();

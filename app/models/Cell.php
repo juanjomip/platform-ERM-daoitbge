@@ -3,10 +3,10 @@
 class Cell extends Eloquent {
 
 	// Corresponds to 200 meters in degrees.
-	//const SIDE_SIZE = 0.0017966;
+	const SIDE_SIZE = 0.0017966;
 
 	// For testing.
-	const SIDE_SIZE = 10;
+	//const SIDE_SIZE = 10;
 
 	protected $table = 'cell';
 
@@ -21,8 +21,8 @@ class Cell extends Eloquent {
 		'top_left_lng',
 		'top_right_lat',
 		'top_right_lng',
-		'bottom_left_lat',
-		'bottom_left_lng'
+		'bottom_right_lat',
+		'bottom_right_lng'
 	);
 
 	private function setBottomLeft() {
@@ -32,17 +32,17 @@ class Cell extends Eloquent {
 
 	private function setTopLeft() {
 		$this->top_left_lat = $this->bottom_left_lat;
-		$this->top_left_lng = $this->bottom_left_lng + ( self::SIDE_SIZE - 1 );
+		$this->top_left_lng = $this->bottom_left_lng + ( self::SIDE_SIZE - 0.0000001 );
 	}
 
 	private function setTopRight() {
-		$this->top_right_lat = $this->top_left_lat + ( self::SIDE_SIZE - 1 );
-		$this->top_right_lat = $this->top_left_lng;
+		$this->top_right_lat = $this->top_left_lat + ( self::SIDE_SIZE - 0.0000001 );
+		$this->top_right_lng = $this->top_left_lng;
 	}
 
 	private function setBootmRight() {
-		$this->top_right_lat = $this->bottom_left_lat + ( self::SIDE_SIZE - 1 );
-		$this->top_right_lat = $this->bottom_left_lng
+		$this->bottom_right_lat = $this->top_right_lat;
+		$this->bottom_right_lng = $this->bottom_left_lng;
 	}
 
 	private function setVertices() {
