@@ -42,9 +42,9 @@ class TableUnprocessedsample extends Migration {
         Schema::create('commune', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->string('nombre');
-            $table->integer('center_lat');
-            $table->integer('center_lng');            
+            $table->string('name');
+            $table->decimal('center_lat', 10,7);
+            $table->decimal('center_lng', 10,7);        
         });
 
         Schema::create('commune_path', function ($table) {
@@ -63,6 +63,8 @@ class TableUnprocessedsample extends Migration {
 	 */
 	public function down()
 	{
+        Schema::drop('commune_path');
+        Schema::drop('commune');
         Schema::drop('cell');
 		Schema::drop('unprocessed_sample');
 	}

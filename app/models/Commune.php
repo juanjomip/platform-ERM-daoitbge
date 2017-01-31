@@ -14,7 +14,7 @@ class Commune extends Eloquent {
 			$path = explode(' ', $path);
 	        $finalpath = array();
 	        $commune = new Commune();
-	        $commune->nombre = $commune_data->name;
+	        $commune->name = $commune_data->name;
 	        $commune->save(); 
 	        foreach ($path as $p) {
 	            $points = explode(',', $p);  
@@ -24,6 +24,9 @@ class Commune extends Eloquent {
 	            $communePath->commune_id = $commune->id;
 	            $communePath->save();                  
 	        }
+	        $commune->center_lat = $communePath->lat;
+	        $commune->center_lng = $communePath->lng;
+	        $commune->save();
 		}
 	}	
 

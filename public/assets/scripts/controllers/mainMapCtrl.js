@@ -3,10 +3,16 @@
 app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     
     $scope.samples = [];
+    $scope.cells = [];
+    $scope.communes = [];
+    $scope.selectedCommune = {
+        name: '',
+        value: 28
+    };    
 
     var santiago = new google.maps.LatLng(-33.465, 289.35)
     $rootScope.map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
+        zoom: 11,
         center: santiago,
         panControl: true,
         zoomControl: true,
@@ -25,8 +31,9 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
                 $scope.cells = response.data.cells;
                 $scope.communes = response.data.communes;
                 $scope.drawCells($scope.cells);
-                $scope.createMarkers($scope.samples);                
-                $scope.drawCommunes($scope.communes);              
+                //$scope.createMarkers($scope.samples);                
+                $scope.drawCommunes($scope.communes);  
+                console.log($scope.cells);            
             },
             function error(response) {
                 console.log(response);
@@ -45,9 +52,38 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     // create markers from samples.
     $scope.drawCommunes = function(comunes) {        
         for (var i = 0; i < comunes.length; i++) {            
-            $scope.drawCommune(comunes[i].path, $rootScope.map);
+            $scope.drawCommune(comunes[i], $rootScope.map);
         }        
-    }   
+    }
+
+    $scope.drawCommune = function(commune, map) {
+        var polygon = new google.maps.Polygon({
+            paths: commune.path,
+            strokeColor: '#000000',
+            strokeOpacity: 0.5,
+            strokeWeight: 0.5,
+            fillColor: '#000000',
+            fillOpacity: 0.1
+        });
+
+        polygon.setMap(map);
+        
+        google.maps.event.addListener(polygon, 'click', function (event) {
+            $scope.communeSelect(commune);
+        });    
+
+        commune.polygon = polygon;
+    }
+
+    $scope.communeSelect = function(commune) {
+        $scope.selectedCommune.name = commune.name;          
+        var latLng = new google.maps.LatLng(commune.center_lat,commune.center_lng)
+        $rootScope.map.panTo(latLng);
+        $scope.showCommune(commune, $rootScope.map);
+        $scope.hideCommunes($scope.communes, commune);
+        $rootScope.map.setZoom(13);
+        $scope.$digest();
+    }
 
     // create marker from a sample.
     $scope.createMarker = function(sample, map) {          
@@ -73,12 +109,34 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         sample.marker = marker;       
     } 
 
+    $scope.hideCommunes = function(communes, exception) {
+        for (var i = 0; i < communes.length; i++) {
+            if(communes[i].name != exception.name)
+                $scope.hideCommune(communes[i]);
+        } 
+    }
+
+    $scope.hideCommune = function(commune) {
+        commune.polygon.setMap(null);
+    }
+
+    $scope.showCommunes = function(communes, exception, map) {
+        for (var i = 0; i < communes.length; i++) {
+            if(communes[i].name != exception.name)
+                $scope.showCommune(communes[i], map);
+        } 
+    }
+    
+    $scope.showCommune = function(commune, map) {
+        commune.polygon.setMap(map);
+    }
+
     // draw cells.
     $scope.drawCells = function(cells) {
         for (var i = 0; i < cells.length; i++) {
             $scope.drawCell(cells[i], $rootScope.map);
         } 
-    }
+    }    
 
     // draw cell.
     $scope.drawCell = function(cell, map) {        
@@ -93,29 +151,17 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
         var polygon = new google.maps.Polygon({
             paths: cellPath,
-            strokeColor: '#FF0000',
+            strokeColor: '#000000',
             strokeOpacity: 0.2,
-            strokeWeight: 0,
-            fillColor: '#FF0000',
+            strokeWeight: 0.5,
+            fillColor: '#000000',
             fillOpacity: 0.2
         });
         polygon.setMap(map);
         cell.polygon = polygon;
     }
 
-    $scope.drawCommune = function(path, map) {
-        $scope.pac = new google.maps.Polygon({
-            paths: path,
-            strokeColor: '#FF0000',
-            strokeOpacity: 0.2,
-            strokeWeight: 0,
-            fillColor: '#FF0000',
-            fillOpacity: 0.2
-        });        
-        $scope.pac.setMap(map);
-       
-
-    }
+    
 
     $scope.getSamples();
 
