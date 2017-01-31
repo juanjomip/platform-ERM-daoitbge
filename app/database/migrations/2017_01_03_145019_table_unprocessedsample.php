@@ -42,7 +42,7 @@ class TableUnprocessedsample extends Migration {
         Schema::create('commune', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->varchar('nombre');
+            $table->string('nombre');
             $table->integer('center_lat');
             $table->integer('center_lng');            
         });

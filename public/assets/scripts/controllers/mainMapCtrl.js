@@ -19,11 +19,14 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     // get all samples from backend.
     $scope.getSamples = function () {
         $http.get('/api/samples')
-            .then(function(response) {                 
+            .then(function(response) {    
+            
                 $scope.samples = response.data.samples;
                 $scope.cells = response.data.cells;
+                $scope.communes = response.data.communes;
                 $scope.drawCells($scope.cells);
                 $scope.createMarkers($scope.samples);                
+                $scope.drawCommunes($scope.communes);              
             },
             function error(response) {
                 console.log(response);
@@ -36,7 +39,15 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         for (var i = 0; i < samples.length; i++) {
             $scope.createMarker(samples[i], $rootScope.map);
         }        
-    }    
+    }  
+
+
+    // create markers from samples.
+    $scope.drawCommunes = function(comunes) {        
+        for (var i = 0; i < comunes.length; i++) {            
+            $scope.drawCommune(comunes[i].path, $rootScope.map);
+        }        
+    }   
 
     // create marker from a sample.
     $scope.createMarker = function(sample, map) {          
@@ -70,9 +81,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     }
 
     // draw cell.
-    $scope.drawCell = function(cell, map) {
-
-        console.log(cell);
+    $scope.drawCell = function(cell, map) {        
         
         var cellPath = [
             {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng},
@@ -80,9 +89,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
             {lat: cell.top_right_lat, lng: cell.top_right_lng},
             {lat: cell.bottom_right_lat, lng: cell.bottom_right_lng},
             {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng}
-        ];
-
-        console.log(cellPath);
+        ];        
 
         var polygon = new google.maps.Polygon({
             paths: cellPath,
@@ -96,6 +103,19 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         cell.polygon = polygon;
     }
 
+    $scope.drawCommune = function(path, map) {
+        $scope.pac = new google.maps.Polygon({
+            paths: path,
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.2,
+            strokeWeight: 0,
+            fillColor: '#FF0000',
+            fillOpacity: 0.2
+        });        
+        $scope.pac.setMap(map);
+       
+
+    }
 
     $scope.getSamples();
 

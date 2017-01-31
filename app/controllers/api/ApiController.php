@@ -27,11 +27,21 @@ class ApiController extends BaseController {
 			$cell->top_right_lng = (float) $cell->top_right_lng;
 			$cell->bottom_right_lat = (float) $cell->bottom_right_lat;
 			$cell->bottom_right_lng	= (float) $cell->bottom_right_lng;			
+		}        
+
+		$communes = Commune::all();
+		foreach ($communes as $commune) {
+			$commune->path = CommunePath::where('commune_id', $commune->id)->get();
+			foreach ($commune->path as $point) {
+				$point->lat = (float) $point->lat;
+				$point->lng = (float) $point->lng;
+			}
 		}
 
 		return array(
 			'samples' => $samples,
-			'cells' => $cells
+			'cells' => $cells,
+			'communes' => $communes
 		);
 	}
 
@@ -57,6 +67,15 @@ class ApiController extends BaseController {
 	public function getTestcell($lat_index, $lng_index) {
 		$cell = Cell::createAndConfig($lat_index, $lng_index);
 		return $cell;
+	}
+
+	public function getCommunesdelete() {
+		DB::table('commune_path')->delete();
+		DB::table('commune')->delete();
+	}
+
+	public function getCommunes() {
+	    Commune::santiagoFromKml();
 	}
 
 }
