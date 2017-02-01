@@ -1,6 +1,11 @@
 <div>
-Comuna: {{selectedCommune.name}} <br>
-Valor: {{selectedCommune.value}}
+<button ng-if="!pageStatus.showCommunes" ng-click="showCommunes(communes)">Mostrar comunas</button>
+<button ng-if="pageStatus.showCommunes" ng-click="hideCommunes(communes)">Ocultar comunas</button>
+
+|
+
+<button ng-if="!pageStatus.showCells" ng-click="showCells(cells)">Mostrar celdas</button>
+<button ng-if="pageStatus.showCells" ng-click="hideCells(cells)">Ocultar celdas</button>
 
 
 <div id="map"></div>

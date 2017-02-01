@@ -36,6 +36,8 @@ class TableUnprocessedsample extends Migration {
             $table->decimal('top_right_lng', 10,7);
             $table->decimal('bottom_right_lat', 10,7);
             $table->decimal('bottom_right_lng', 10,7);
+            $table->decimal('center_lat', 10,7);
+            $table->decimal('center_lng', 10,7);
             
         });
 
@@ -57,6 +59,7 @@ class TableUnprocessedsample extends Migration {
 
         Schema::create('cell_commune', function ($table) {
             $table->engine = 'InnoDB';
+            $table->increments('id');
             $table->integer('cell_id');
             $table->integer('commune_id');            
                    

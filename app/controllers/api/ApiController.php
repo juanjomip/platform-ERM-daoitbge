@@ -46,6 +46,25 @@ class ApiController extends BaseController {
 		);
 	}
 
+	public function getCommunecells($id) {
+		$commune = Commune::find($id);
+
+		$cells = Cell::join('cell_commune', 'cell.id', '=', 'cell_commune.cell_id')->where('cell_commune.commune_id', $commune->id)->get();
+		foreach ($cells as $cell) {
+			$cell->lat_index = (float) $cell->lat_index;
+			$cell->lng_index = (float) $cell->lng_index;
+			$cell->bottom_left_lat = (float) $cell->bottom_left_lat;
+			$cell->bottom_left_lng = (float) $cell->bottom_left_lng;
+			$cell->top_left_lat = (float) $cell->top_left_lat;
+			$cell->top_left_lng = (float) $cell->top_left_lng;
+			$cell->top_right_lat = (float) $cell->top_right_lat;
+			$cell->top_right_lng = (float) $cell->top_right_lng;
+			$cell->bottom_right_lat = (float) $cell->bottom_right_lat;
+			$cell->bottom_right_lng	= (float) $cell->bottom_right_lng;			
+		}       
+		return array('cells' => $cells);
+	}
+
 	public function postSamples() {
 		$inputs = Input::all();
 		foreach ($inputs['samples'] as $sample) {
@@ -96,6 +115,13 @@ class ApiController extends BaseController {
 		$cell->assignCommunes();
 		$communes = DB::table('cell_commune')->where('cell_id', $cell->id)->join('commune', 'commune.id', '=', 'cell_commune.commune_id')->select('commune.name')->get();
 		return array('response' => $communes);
+	}
+
+	public function getPolygons(){
+		$cells = Cell::all();
+		foreach ($cells as $cell) {
+			$cell->assignCommunes();
+		}
 	}
 
 }

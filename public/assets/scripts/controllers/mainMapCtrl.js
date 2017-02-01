@@ -4,11 +4,12 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     
     $scope.samples = [];
     $scope.cells = [];
-    $scope.communes = [];
-    $scope.selectedCommune = {
-        name: '',
-        value: 28
-    };    
+    $scope.communes = [];     
+
+    $scope.pageStatus = {
+        showCommunes: true,
+        showCells: true       
+    }  
 
     var santiago = new google.maps.LatLng(-33.465, 289.35)
     $rootScope.map = new google.maps.Map(document.getElementById('map'), {
@@ -25,15 +26,26 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     // get all samples from backend.
     $scope.getSamples = function () {
         $http.get('/api/samples')
-            .then(function(response) {    
-            
+            .then(function(response) {           
                 $scope.samples = response.data.samples;
                 $scope.cells = response.data.cells;
                 $scope.communes = response.data.communes;
-                $scope.drawCells($scope.cells);
+                //$scope.drawCells($scope.cells);
                 //$scope.createMarkers($scope.samples);                
-                $scope.drawCommunes($scope.communes);  
-                console.log($scope.cells);            
+                $scope.drawCommunes($scope.communes);                          
+            },
+            function error(response) {
+                console.log(response);
+            }
+        );         
+    }
+
+    $scope.getCommuneCells = function (commune_id) {        
+        $http.get('/api/communecells/' + commune_id)
+            .then(function(response) {                 
+                $scope.hideCells($scope.cells);
+                $scope.cells = response.data.cells;
+                $scope.drawCells($scope.cells);                    
             },
             function error(response) {
                 console.log(response);
@@ -98,13 +110,35 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         
         google.maps.event.addListener(polygon, 'click', function (event) {
             $scope.selectCommune(commune);
-        });    
+        });
+
+        google.maps.event.addListener(polygon, 'mouseover', function (event) {            
+            $scope.communeMouseOver(commune);
+        });  
+
+        google.maps.event.addListener(polygon, 'mouseout', function (event) {            
+            $scope.communeMouseOut(commune);
+        });  
 
         commune.polygon = polygon;
     }
 
+    $scope.communeMouseOver = function(commune) {
+        commune.polygon.setOptions({
+            strokeOpacity: 1,
+            strokeWeight: 0.5,
+        });
+    }
+
+    $scope.communeMouseOut = function(commune) {
+        commune.polygon.setOptions({
+            strokeOpacity: 0.5,
+            strokeWeight: 0.5,
+        });
+    }
+
     $scope.selectCommune = function(commune) {
-        $scope.selectedCommune.name = commune.name;          
+        $scope.getCommuneCells(commune.id);               
         var latLng = new google.maps.LatLng(commune.center_lat,commune.center_lng)
         $rootScope.map.panTo(latLng);
         $scope.showCommune(commune, $rootScope.map);
@@ -113,22 +147,37 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         $scope.$digest();
     }    
 
-    $scope.hideCommunes = function(communes, exception) {
-        for (var i = 0; i < communes.length; i++) {
-            if(communes[i].name != exception.name)
-                $scope.hideCommune(communes[i]);
-        } 
+    $scope.hideCommunes = function(communes, exception) {        
+        if(exception != undefined) {
+            for (var i = 0; i < communes.length; i++) {            
+                if(communes[i].name != exception.name)
+                    $scope.hideCommune(communes[i], map);                     
+            }
+        } else {
+            for (var i = 0; i < communes.length; i++) {            
+                $scope.hideCommune(communes[i], map);                     
+            }
+        }
+        $scope.pageStatus.showCommunes = false;
     }
 
     $scope.hideCommune = function(commune) {
         commune.polygon.setMap(null);
     }
 
-    $scope.showCommunes = function(communes, exception, map) {
-        for (var i = 0; i < communes.length; i++) {
-            if(communes[i].name != exception.name)
-                $scope.showCommune(communes[i], map);
-        } 
+    $scope.showCommunes = function(communes, exception) {
+        var map = $rootScope.map;       
+        if(exception != undefined) {
+            for (var i = 0; i < communes.length; i++) {            
+                if(communes[i].name != exception.name)
+                    $scope.showCommune(communes[i], map);                     
+            }
+        } else {
+            for (var i = 0; i < communes.length; i++) {            
+                $scope.showCommune(communes[i], map);                     
+            }
+        }
+        $scope.pageStatus.showCommunes = true;
     }
     
     $scope.showCommune = function(commune, map) {
@@ -148,7 +197,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     }    
 
     // draw cell.
-    $scope.drawCell = function(cell, map) {        
+    $scope.drawCell = function(cell, map) {  
         
         var cellPath = [
             {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng},
@@ -169,13 +218,83 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         polygon.setMap(map);
 
         google.maps.event.addListener(polygon, 'click', function (event) {
-            console.log(cell);
+            $scope.selectCell(cell);
+        });
+
+        google.maps.event.addListener(polygon, 'mouseover', function (event) {            
+            $scope.cellMouseOver(cell);
+        });  
+
+        google.maps.event.addListener(polygon, 'mouseout', function (event) {            
+            $scope.cellMouseOut(cell);
         });
 
         cell.polygon = polygon;
     }
 
-    
+    $scope.cellMouseOver = function(cell) {
+        cell.polygon.setOptions({
+            strokeOpacity: 1,
+            strokeWeight: 0.5,
+        });
+    }
+
+    $scope.cellMouseOut = function(cell) {
+        cell.polygon.setOptions({
+            strokeOpacity: 0.5,
+            strokeWeight: 0.5,
+        });
+    }
+
+    $scope.showCell = function(cell, map) {
+        if(cell.polygon != undefined)
+            cell.polygon.setMap(map);
+    } 
+
+    $scope.showCells = function(cells, exception) {
+        var map = $rootScope.map;       
+        if(exception != undefined) {
+            for (var i = 0; i < cells.length; i++) {            
+                if(cells[i].id != exception.id)
+                    $scope.showCommune(cells[i], map);                     
+            }
+        } else {
+            for (var i = 0; i < cells.length; i++) {            
+                $scope.showCommune(cells[i], map);                     
+            }
+        }
+        $scope.pageStatus.showCells = true;
+    }    
+
+    $scope.hideCell = function(cell) {
+        if(cell.polygon != undefined)
+            cell.polygon.setMap(null);
+    }
+
+    $scope.hideCells = function(cells, exception) {        
+        if(exception != undefined) {
+            for (var i = 0; i < cells.length; i++) {            
+                if(cells[i].id != exception.id)
+                    $scope.hideCell(cells[i], map);                     
+            }
+        } else {
+            for (var i = 0; i < cells.length; i++) {            
+                $scope.hideCell(cells[i], map);                     
+            }
+        }
+        $scope.pageStatus.showCells = false;
+    }
+
+    $scope.selectCell = function(cell){       
+        var latLng = new google.maps.LatLng(cell.center_lat, cell.center_lng);        
+        $rootScope.map.setZoom(17);
+        $rootScope.map.panTo(latLng);
+    } 
+
+    /* Init *****************************************************************************************************
+    |
+    |
+    |****************************************************************************************************************/
 
     $scope.getSamples();
 

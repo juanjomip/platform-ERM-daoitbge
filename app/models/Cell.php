@@ -52,6 +52,11 @@ class Cell extends Eloquent {
 		$this->setBootmRight();
 	}
 
+	private function setCenter() {
+		$this->center_lat = $this->top_left_lat + ( self::SIDE_SIZE / 2 );
+		$this->center_lng = $this->bottom_left_lng + ( self::SIDE_SIZE / 2 );		
+	}
+
 	// Creates a new cell with lower left vertex the point corresponding to
 	// the multiplication of the constant SIDE_SIZE and the value of LAT_INDEX
 	// and LNG_INDEX respectively.
@@ -62,7 +67,9 @@ class Cell extends Eloquent {
 		$cell->lat_index = $lat_index;
 		$cell->lng_index = $lng_index;
 		$cell->setVertices();
+		$cell->setCenter();
 		$cell->save();
+		$cell->assignCommunes();
 		return $cell;
 	}
 
