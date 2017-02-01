@@ -46,43 +46,6 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         for (var i = 0; i < samples.length; i++) {
             $scope.createMarker(samples[i], $rootScope.map);
         }        
-    }  
-
-
-    // create markers from samples.
-    $scope.drawCommunes = function(comunes) {        
-        for (var i = 0; i < comunes.length; i++) {            
-            $scope.drawCommune(comunes[i], $rootScope.map);
-        }        
-    }
-
-    $scope.drawCommune = function(commune, map) {
-        var polygon = new google.maps.Polygon({
-            paths: commune.path,
-            strokeColor: '#000000',
-            strokeOpacity: 0.5,
-            strokeWeight: 0.5,
-            fillColor: '#000000',
-            fillOpacity: 0.1
-        });
-
-        polygon.setMap(map);
-        
-        google.maps.event.addListener(polygon, 'click', function (event) {
-            $scope.communeSelect(commune);
-        });    
-
-        commune.polygon = polygon;
-    }
-
-    $scope.communeSelect = function(commune) {
-        $scope.selectedCommune.name = commune.name;          
-        var latLng = new google.maps.LatLng(commune.center_lat,commune.center_lng)
-        $rootScope.map.panTo(latLng);
-        $scope.showCommune(commune, $rootScope.map);
-        $scope.hideCommunes($scope.communes, commune);
-        $rootScope.map.setZoom(13);
-        $scope.$digest();
     }
 
     // create marker from a sample.
@@ -109,6 +72,47 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         sample.marker = marker;       
     } 
 
+    /* Communes *****************************************************************************************************
+    |
+    |
+    |****************************************************************************************************************/
+
+    // create markers from samples.
+    $scope.drawCommunes = function(comunes) {        
+        for (var i = 0; i < comunes.length; i++) {            
+            $scope.drawCommune(comunes[i], $rootScope.map);
+        }        
+    }
+
+    $scope.drawCommune = function(commune, map) {
+        var polygon = new google.maps.Polygon({
+            paths: commune.path,
+            strokeColor: '#000000',
+            strokeOpacity: 0.5,
+            strokeWeight: 0.5,
+            fillColor: '#000000',
+            fillOpacity: 0.1
+        });
+
+        polygon.setMap(map);
+        
+        google.maps.event.addListener(polygon, 'click', function (event) {
+            $scope.selectCommune(commune);
+        });    
+
+        commune.polygon = polygon;
+    }
+
+    $scope.selectCommune = function(commune) {
+        $scope.selectedCommune.name = commune.name;          
+        var latLng = new google.maps.LatLng(commune.center_lat,commune.center_lng)
+        $rootScope.map.panTo(latLng);
+        $scope.showCommune(commune, $rootScope.map);
+        $scope.hideCommunes($scope.communes, commune);
+        $rootScope.map.setZoom(13);
+        $scope.$digest();
+    }    
+
     $scope.hideCommunes = function(communes, exception) {
         for (var i = 0; i < communes.length; i++) {
             if(communes[i].name != exception.name)
@@ -130,6 +134,11 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     $scope.showCommune = function(commune, map) {
         commune.polygon.setMap(map);
     }
+
+    /* Cells *****************************************************************************************************
+    |
+    |
+    |****************************************************************************************************************/
 
     // draw cells.
     $scope.drawCells = function(cells) {
@@ -158,6 +167,11 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
             fillOpacity: 0.2
         });
         polygon.setMap(map);
+
+        google.maps.event.addListener(polygon, 'click', function (event) {
+            console.log(cell);
+        });
+
         cell.polygon = polygon;
     }
 

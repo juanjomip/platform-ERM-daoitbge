@@ -54,6 +54,26 @@ class TableUnprocessedsample extends Migration {
             $table->decimal('lat', 10,7);
             $table->decimal('lng', 10,7);          
         });
+
+        Schema::create('cell_commune', function ($table) {
+            $table->engine = 'InnoDB';
+            $table->integer('cell_id');
+            $table->integer('commune_id');            
+                   
+        });
+
+        // Start Seed.
+
+        Commune::santiagoFromKml();
+
+        $paths = CommunePath::all();
+        foreach ($paths as $path) {
+            $sample = new UnprocessedSample();
+            $sample->lat = $path->lat;
+            $sample->lng = $path->lng;
+            $sample->save();
+            $sample->assignCell();
+        }
 	}
 
 	/**
@@ -63,6 +83,7 @@ class TableUnprocessedsample extends Migration {
 	 */
 	public function down()
 	{
+        Schema::drop('cell_commune');
         Schema::drop('commune_path');
         Schema::drop('commune');
         Schema::drop('cell');

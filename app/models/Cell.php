@@ -65,4 +65,14 @@ class Cell extends Eloquent {
 		$cell->save();
 		return $cell;
 	}
+
+	public function assignCommunes() {
+		$communes = Commune::all();
+		foreach ($communes as $commune) {
+			if($commune->cellIsInside($this)) {
+				DB::table('cell_commune')->insert(array('commune_id' => $commune->id, 'cell_id' => $this->id));
+			}
+		}
+		return true;
+	}
 }

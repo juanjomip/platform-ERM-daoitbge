@@ -75,13 +75,11 @@ class ApiController extends BaseController {
 		DB::table('commune')->delete();
 	}
 
-	public function getCommunes() {
+	/*public function getCommunes() {
 	    Commune::santiagoFromKml();
-	}
+	}*/
 
-	public function getCells() {		
-		
-		
+	/*public function getCells() {	
 		$paths = CommunePath::all();
 		foreach ($paths as $path) {
 			$sample = new UnprocessedSample();
@@ -90,6 +88,14 @@ class ApiController extends BaseController {
 			$sample->save();
 			$sample->assignCell();
 		}
+	}*/
+
+	public function getPolygon($id) {
+		//cell 119061
+		$cell = Cell::find($id);		
+		$cell->assignCommunes();
+		$communes = DB::table('cell_commune')->where('cell_id', $cell->id)->join('commune', 'commune.id', '=', 'cell_commune.commune_id')->select('commune.name')->get();
+		return array('response' => $communes);
 	}
 
 }
