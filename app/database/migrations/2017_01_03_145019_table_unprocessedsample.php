@@ -69,13 +69,27 @@ class TableUnprocessedsample extends Migration {
 
         Commune::santiagoFromKml();
 
-        $paths = CommunePath::all();
+        /*$paths = CommunePath::all();
         foreach ($paths as $path) {
             $sample = new UnprocessedSample();
             $sample->lat = $path->lat;
             $sample->lng = $path->lng;
             $sample->save();
             $sample->assignCell();
+        }*/
+
+        //33.3633808,-70.5640598 top right
+        
+        // bottom left -33.498147,-70.7384529,12.17
+
+        //                      culador-18571  -39277
+        // -18646  -39374 
+
+
+        for ($i=-18750; $i < -18530; $i++) {            
+            for ($j=-39450; $j < -39210; $j++) { 
+                Cell::createAndConfig($i, $j);
+            }
         }
 	}
 

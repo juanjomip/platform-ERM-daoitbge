@@ -15,7 +15,7 @@ class ApiController extends BaseController {
 			$sample->lng = (float) $sample->lng;
 		}
 
-		$cells = Cell::all();
+		$cells = [];
 		foreach ($cells as $cell) {
 			$cell->lat_index = (float) $cell->lat_index;
 			$cell->lng_index = (float) $cell->lng_index;
@@ -121,6 +121,19 @@ class ApiController extends BaseController {
 		$cells = Cell::all();
 		foreach ($cells as $cell) {
 			$cell->assignCommunes();
+		}
+	}
+
+	public function getSantiagocells() {
+		//33.3633808,-70.5640598 top right
+		
+		// bottom left -33.498147,-70.7384529,12.17
+
+		//						culador-18571  -39277
+		// -18646  -39374 
+
+		for ($i=-18646; $i < -18571; $i++) { 
+			Cell::createAndConfig($i, -39277);
 		}
 	}
 

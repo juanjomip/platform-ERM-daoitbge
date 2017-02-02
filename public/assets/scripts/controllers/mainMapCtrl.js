@@ -241,7 +241,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
     $scope.cellMouseOut = function(cell) {
         cell.polygon.setOptions({
-            strokeOpacity: 0.5,
+            strokeOpacity: 0.2,
             strokeWeight: 0.5,
         });
     }
