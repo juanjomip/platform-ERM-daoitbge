@@ -39,7 +39,39 @@ class ApiController extends BaseController {
 				$point->lng = (float) $point->lng;
 			}
 		}
+
+		$bandas = ['X', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N'];
+		$husos = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+
+		$markers = [];
+		//foreach ($bandas as $banda) {
+			//foreach ($husos as $huso) {				
+				$c = new  PHPCoord\UTMRef(500000, 0, 0,  'S', 30);
+				$l = $c->toLatLng();
+				$p = array(
+					"lat" => $l->getLat(),
+					"lng" => $l->getLng()				
+					);
+				//array_push($markers, $p);	
+
+
+				$c = new  PHPCoord\UTMRef(343025, 6298336, 0,  'H', 19);
+				$l = $c->toLatLng();
+				$p = array(
+					"lat" => $l->getLat(),
+					"lng" => $l->getLng()				
+					);
+				array_push($markers, $p);
+
+							
+		//	}
+		//}
+
+		
+		
+		
 		return array(
+			'markers' => $markers,
 			'samples' => $samples,
 			'cells' => $cells,
 			'communes' => $communes

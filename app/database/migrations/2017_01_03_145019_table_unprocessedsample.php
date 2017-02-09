@@ -12,7 +12,7 @@ class TableUnprocessedsample extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('unprocessed_sample', function ($table) {
+		/*Schema::create('unprocessed_sample', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
             $table->integer('value');
@@ -20,8 +20,7 @@ class TableUnprocessedsample extends Migration {
             $table->decimal('lng', 10, 7);   
             $table->integer('cell_code');         
             $table->datetime('datetime')->nullable()->default(null);
-        });
-       
+        });       
 
         Schema::create('cell', function ($table) {
             $table->engine = 'InnoDB';
@@ -39,7 +38,7 @@ class TableUnprocessedsample extends Migration {
             $table->decimal('center_lat', 10,7);
             $table->decimal('center_lng', 10,7);
             
-        });
+        });*
 
         Schema::create('commune', function ($table) {
             $table->engine = 'InnoDB';
@@ -63,116 +62,17 @@ class TableUnprocessedsample extends Migration {
             $table->integer('cell_id');
             $table->integer('commune_id');            
                    
-        });
+        });*/
 		
 	//
 		
-	public function up()
-	{
+	
 		
-	Schema::create('user', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-	    $table->string('username');
-	    $table->string('password');
-            $table->decimal('lat', 10, 7);
-            $table->decimal('lng', 10, 7);                      
-                   
-        });
-		
-	Schema::create('sample', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-	    $table->integer('user_id');
-            $table->integer('value');
-            $table->decimal('lat', 10, 7);
-            $table->decimal('lng', 10, 7);   
-            $table->integer('cell_code');         
-            $table->datetime('datetime')->nullable()->default(null);
-        });
-       
-
-        Schema::create('cell', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-            $table->integer('lat_index');
-            $table->integer('lng_index');
-            $table->decimal('bottom_left_lat', 10,7);
-            $table->decimal('bottom_left_lng', 10,7);
-            $table->decimal('top_left_lat', 10,7);
-            $table->decimal('top_left_lng', 10,7);
-            $table->decimal('top_right_lat', 10,7);
-            $table->decimal('top_right_lng', 10,7);
-            $table->decimal('bottom_right_lat', 10,7);
-            $table->decimal('bottom_right_lng', 10,7);
-            $table->decimal('center_lat', 10,7);
-            $table->decimal('center_lng', 10,7);
-            
-        });
-
-        Schema::create('polygon', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-            $table->string('name');
-            $table->decimal('center_lat', 10,7);
-            $table->decimal('center_lng', 10,7);        
-        });
-		
-	 Schema::create('sensitive_area', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-            $table->string('name');
-            $table->decimal('center_lat', 10,7);
-            $table->decimal('center_lng', 10,7);
-	    $table->integer('radio');
-        });
-
-        Schema::create('polygon_path', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-            $table->integer('commune_id');            
-            $table->decimal('lat', 10,7);
-            $table->decimal('lng', 10,7);          
-        });
-
-        Schema::create('cell_polygon', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-            $table->integer('cell_id');
-            $table->integer('commune_id');            
-                   
-        });
-		
-	Schema::create('cell_measurement', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-	    $table->increments('cell_id');		
-            $table->date('date');
-            $table->integer('value');            
-                   
-        });
-		
-	Schema::create('polygon_measurement', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-	    $table->increments('polygon_id');
-            $table->date('date');
-            $table->integer('value');            
-                   
-        });
-		
-	Schema::create('sensitive_area_measurement', function ($table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-	    $table->increments('sensitive_area_id');
-            $table->date('date');
-            $table->integer('value');            
-                   
-        });
+	   
 
         // Start Seed.
 
-        Commune::santiagoFromKml();
+        //Commune::santiagoFromKml();
 
         /*$paths = CommunePath::all();
         foreach ($paths as $path) {
@@ -191,11 +91,11 @@ class TableUnprocessedsample extends Migration {
         // -18646  -39374 
 
 
-        for ($i=-18750; $i < -18530; $i++) {            
+        /*for ($i=-18750; $i < -18530; $i++) {            
             for ($j=-39450; $j < -39210; $j++) { 
                 Cell::createAndConfig($i, $j);
             }
-        }
+        }*/
 	}
 
 	/**

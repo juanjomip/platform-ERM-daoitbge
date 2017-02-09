@@ -30,7 +30,10 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
                 $scope.samples = response.data.samples;
                 $scope.cells = response.data.cells;
                 $scope.communes = response.data.communes;
+
+                console.log(response.data.markers);
                 //$scope.drawCells($scope.cells);
+                $scope.createUTMS(response.data.markers);
                 //$scope.createMarkers($scope.samples);                
                 $scope.drawCommunes($scope.communes);                          
             },
@@ -82,7 +85,37 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
         marker.infowindow = infowindow;        
         sample.marker = marker;       
-    } 
+    }
+
+    $scope.createUTMS = function(samples) {        
+        for (var i = 0; i < samples.length; i++) {
+            $scope.createUTM(samples[i], $rootScope.map);
+        }        
+    }
+
+    // create marker from a sample.
+    $scope.createUTM = function(sample, map) {          
+        var position = new google.maps.LatLng(sample.lat, sample.lng)
+        var marker = new google.maps.Marker({
+        position: position,            
+            map: map,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 4
+            },            
+        });
+
+        var infowindow = new google.maps.InfoWindow({
+            content: 'value : ' + sample.value + ' - date : ' + sample.datetime
+        });
+  
+        marker.addListener('click', function() {
+            infowindow.open(map, marker);
+        });
+
+        marker.infowindow = infowindow;        
+        sample.marker = marker;       
+    }  
 
     /* Communes *****************************************************************************************************
     |

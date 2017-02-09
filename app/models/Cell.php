@@ -82,4 +82,33 @@ class Cell extends Eloquent {
 		}
 		return true;
 	}
+
+	public static function merc_x($lon)
+	{
+		$r_major = 6378137.000;
+		return $r_major * deg2rad($lon);
+	}
+
+	public static function merc_y($lat)
+	{
+		if ($lat > 89.5) $lat = 89.5;
+		if ($lat < -89.5) $lat = -89.5;
+		$r_major = 6378137.000;
+	    $r_minor = 6356752.3142;
+	    $temp = $r_minor / $r_major;
+		$es = 1.0 - ($temp * $temp);
+	    $eccent = sqrt($es);
+	    $phi = deg2rad($lat);
+	    $sinphi = sin($phi);
+	    $con = $eccent * $sinphi;
+	    $com = 0.5 * $eccent;
+		$con = pow((1.0-$con)/(1.0+$con), $com);
+		$ts = tan(0.5 * ((M_PI*0.5) - $phi))/$con;
+	    $y = - $r_major * log($ts);
+	    return $y;
+	}
+
+	public static function merc($x,$y) {
+	    return array('x'=>Cell::merc_x($x),'y'=>Cell::merc_y($y));
+	}
 }
