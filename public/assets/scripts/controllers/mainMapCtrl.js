@@ -31,11 +31,15 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
                 $scope.cells = response.data.cells;
                 $scope.communes = response.data.communes;
 
+                console.log('cells');
+                console.log(response.data.cells);
+
+                console.log('markers');
                 console.log(response.data.markers);
-                //$scope.drawCells($scope.cells);
-                $scope.createUTMS(response.data.markers);
+                $scope.drawCells($scope.cells);
+                //$scope.createUTMS(response.data.markers);
                 //$scope.createMarkers($scope.samples);                
-                $scope.drawCommunes($scope.communes);                          
+                //$scope.drawCommunes($scope.communes);                          
             },
             function error(response) {
                 console.log(response);
@@ -231,14 +235,9 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
     // draw cell.
     $scope.drawCell = function(cell, map) {  
-        
-        var cellPath = [
-            {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng},
-            {lat: cell.top_left_lat, lng: cell.top_left_lng},
-            {lat: cell.top_right_lat, lng: cell.top_right_lng},
-            {lat: cell.bottom_right_lat, lng: cell.bottom_right_lng},
-            {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng}
-        ];        
+        var cellPath = cell.path;
+        console.log(cell.path);
+        cell.path.push(cell.path[0]);        
 
         var polygon = new google.maps.Polygon({
             paths: cellPath,

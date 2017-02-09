@@ -105,11 +105,11 @@ class TableUnprocessedsample extends Migration {
 	 */
 	public function down()
 	{
-        Schema::drop('cell_commune');
+        /*Schema::drop('cell_commune');
         Schema::drop('commune_path');
         Schema::drop('commune');
         Schema::drop('cell');
-		Schema::drop('unprocessed_sample');
+		Schema::drop('unprocessed_sample');*/
 	}
 
 }

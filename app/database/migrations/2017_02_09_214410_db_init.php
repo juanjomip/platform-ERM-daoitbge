@@ -25,7 +25,7 @@ class DbInit extends Migration {
 	   Schema::create('sample', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-	        $table->integer('user_id');
+	        $table->integer('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')->on('user');
             $table->integer('value');
             $table->decimal('lat', 10, 7);
@@ -38,20 +38,25 @@ class DbInit extends Migration {
         Schema::create('cell', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->integer('lat_index');
-            $table->integer('lng_index');
-            $table->decimal('bottom_left_lat', 10,7);
-            $table->decimal('bottom_left_lng', 10,7);
-            $table->decimal('top_left_lat', 10,7);
-            $table->decimal('top_left_lng', 10,7);
-            $table->decimal('top_right_lat', 10,7);
-            $table->decimal('top_right_lng', 10,7);
-            $table->decimal('bottom_right_lat', 10,7);
-            $table->decimal('bottom_right_lng', 10,7);
+            $table->integer('index_x');
+            $table->integer('index_y');
             $table->decimal('center_lat', 10,7);
             $table->decimal('center_lng', 10,7);
-            
+            $table->string('utm_lat_zone');
+            $table->integer('utm_lng_zone');           
         });
+
+        Schema::create('cell_path', function ($table) {
+            $table->engine = 'InnoDB';
+            $table->increments('id');
+            $table->integer('cell_id')->unsigned()->nullable();
+            $table->foreign('cell_id')->references('id')->on('cell');           
+            $table->decimal('lat', 10,7);
+            $table->decimal('lng', 10,7);            
+            $table->integer('utm_x');
+            $table->integer('utm_y');            
+        });
+
 
         Schema::create('polygon', function ($table) {
             $table->engine = 'InnoDB';
@@ -73,7 +78,7 @@ class DbInit extends Migration {
         Schema::create('polygon_path', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->integer('polygon_id');
+            $table->integer('polygon_id')->unsigned()->nullable();
             $table->foreign('polygon_id')->references('id')->on('polygon');         
             $table->decimal('lat', 10,7);
             $table->decimal('lng', 10,7);          
@@ -82,16 +87,16 @@ class DbInit extends Migration {
         Schema::create('cell_polygon', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-            $table->integer('cell_id');
+            $table->integer('cell_id')->unsigned()->nullable();
             $table->foreign('cell_id')->references('id')->on('cell');
-            $table->integer('polygon_id'); 
+            $table->integer('polygon_id')->unsigned()->nullable();
             $table->foreign('polygon_id')->references('id')->on('polygon');                  
         });
 		
 	    Schema::create('cell_measurement', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');	        
-            $table->integer('cell_id');
+            $table->integer('cell_id')->unsigned()->nullable();
             $table->foreign('cell_id')->references('id')->on('cell');	
             $table->date('date');
             $table->integer('value');            
@@ -101,7 +106,7 @@ class DbInit extends Migration {
 	    Schema::create('polygon_measurement', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
-	        $table->integer('polygon_id');
+	        $table->integer('polygon_id')->unsigned()->nullable();
             $table->foreign('polygon_id')->references('id')->on('polygon');
             $table->date('date');
             $table->integer('value');            
@@ -111,12 +116,14 @@ class DbInit extends Migration {
 	    Schema::create('sensitive_area_measurement', function ($table) {
             $table->engine = 'InnoDB';
             $table->increments('id');	       
-            $table->integer('sensitive_area_id');
+            $table->integer('sensitive_area_id')->unsigned()->nullable();
             $table->foreign('sensitive_area_id')->references('id')->on('sensitive_area');
             $table->date('date');
             $table->integer('value');            
                    
         });
+
+        UTMCell::makeDefaultCells();
 	}
 
 	/**
@@ -132,7 +139,9 @@ class DbInit extends Migration {
 		Schema::drop('cell_polygon');
 		Schema::drop('polygon_path');
 		Schema::drop('polygon');
+        Schema::drop('cell_path');
 		Schema::drop('cell');
+        Schema::drop('sensitive_area');
 		Schema::drop('sample');
 		Schema::drop('user');
 	}
