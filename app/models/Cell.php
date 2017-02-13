@@ -69,17 +69,50 @@ class Cell extends Eloquent {
 		$cell->setVertices();
 		$cell->setCenter();
 		$cell->save();
-		$cell->assignCommunes();
+		$cell->assignPolygons();
 		return $cell;
 	}
 
-	public function assignCommunes() {
-		$communes = Commune::all();
+	public function assignPolygons() {
+		$communes = Polygon::all();
 		foreach ($communes as $commune) {
 			if($commune->cellIsInside($this)) {
-				DB::table('cell_commune')->insert(array('commune_id' => $commune->id, 'cell_id' => $this->id));
+				DB::table('cell_polygon')->insert(array('polygon_id' => $commune->id, 'cell_id' => $this->id));
 			}
 		}
 		return true;
+	}
+
+	public function updateMeasurement($sample) {
+		// if measurement already are in database just update, else save first measurement.
+ 		if($measurement = DB::table('cell_measurement')->where('date', $sample->date)->where('cell_id', $this->id)->first()) {
+			// calculates average.
+ 			$newValue = ($measurement->quantity*$measurement->value + $sample->value)/($measurement->quantity +1);			
+			$measurement->quantity = $measurement->quantity+1;			
+			DB::table('cell_measurement')->where('date', $sample->date)->where('cell_id', $this->id)->update(
+				array(
+					'cell_id' => $this->id,					
+					'value' => $newValue,
+					'quantity' => $measurement->quantity
+				)
+			);			
+		} else {
+			DB::table('cell_measurement')->insert(
+				array(
+					'cell_id' => $this->id,
+					'date' => $sample->date,
+					'value' => $sample->value,
+					'quantity' => 1
+				)
+			);			
+		}
+		$this->updatePolygons();
+	}
+
+	public function updatePolygons() {
+		$polygons = Polygon::join('cell_polygon', 'cell_polygon.polygon_id', '=', 'polygon.id')->where('cell_polygon.cell_id', $this->id)->get();
+		foreach ($polygons as $polygon) {
+			$polygon->updateMeasurement();
+		}
 	}
 }

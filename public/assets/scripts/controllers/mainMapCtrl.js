@@ -23,14 +23,20 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         draggable: true
     });
 
+    $scope.query = function() {
+        console.log($scope.minDate);
+        console.log($scope.maxDate);
+    }
+
     // get all samples from backend.
     $scope.getSamples = function () {
         $http.get('/api/samples')
             .then(function(response) {           
                 $scope.samples = response.data.samples;
                 $scope.cells = response.data.cells;
+                
                 $scope.communes = response.data.communes;
-                //$scope.drawCells($scope.cells);
+                $scope.drawCells($scope.cells);
                 //$scope.createMarkers($scope.samples);                
                 $scope.drawCommunes($scope.communes);                          
             },
@@ -41,8 +47,9 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     }
 
     $scope.getCommuneCells = function (commune_id) {        
-        $http.get('/api/communecells/' + commune_id)
-            .then(function(response) {                 
+        $http.get('/api/polygoncells/' + commune_id)
+            .then(function(response) {
+                console.log(response);                 
                 $scope.hideCells($scope.cells);
                 $scope.cells = response.data.cells;
                 $scope.drawCells($scope.cells);                    

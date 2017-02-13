@@ -12,12 +12,14 @@ class UNprocessedSample extends Eloquent {
 		$lat_index = floor($this->lat/Cell::SIDE_SIZE);
 		$lng_index = floor($this->lng/Cell::SIDE_SIZE);		
 		if($cell = Cell::where('lat_index', $lat_index)->where('lng_index', $lng_index)->first()) {
-			$this->cell_code = $cell->id;
+			$this->cell_id = $cell->id;
 			$this->save();
+			$cell->updateMeasurement($this);
 		} else {
 			$cell = Cell::createAndConfig($lat_index, $lng_index);
-			$this->cell_code = $cell->id;
+			$this->cell_id = $cell->id;
 			$this->save();
+			$cell->updateMeasurement($this);
 		}
 	}
 }

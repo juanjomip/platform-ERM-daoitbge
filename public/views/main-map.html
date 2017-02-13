@@ -3,7 +3,9 @@
 <button ng-if="pageStatus.showCommunes" ng-click="hideCommunes(communes)">Ocultar comunas</button>
 
 |
-
+<input type="date" ng-model="minDate">
+<input type="date" ng-model="maxDate">
+<button ng-click="query()"> Consultar </button>
 <button ng-if="!pageStatus.showCells" ng-click="showCells(cells)">Mostrar celdas</button>
 <button ng-if="pageStatus.showCells" ng-click="hideCells(cells)">Ocultar celdas</button>
 
