@@ -36,9 +36,22 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
                 $scope.cells = response.data.cells;
                 
                 $scope.communes = response.data.communes;
+<<<<<<< HEAD
                 $scope.drawCells($scope.cells);
                 //$scope.createMarkers($scope.samples);                
                 $scope.drawCommunes($scope.communes);                          
+=======
+
+                console.log('cells');
+                console.log(response.data.cells);
+
+                console.log('markers');
+                console.log(response.data.markers);
+                $scope.drawCells($scope.cells);
+                //$scope.createUTMS(response.data.markers);
+                $scope.createMarkers($scope.samples);                
+                //$scope.drawCommunes($scope.communes);                          
+>>>>>>> 63f52bfd48e7c5c21b22424737ebfa4059608583
             },
             function error(response) {
                 console.log(response);
@@ -89,7 +102,37 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
         marker.infowindow = infowindow;        
         sample.marker = marker;       
-    } 
+    }
+
+    $scope.createUTMS = function(samples) {        
+        for (var i = 0; i < samples.length; i++) {
+            $scope.createUTM(samples[i], $rootScope.map);
+        }        
+    }
+
+    // create marker from a sample.
+    $scope.createUTM = function(sample, map) {          
+        var position = new google.maps.LatLng(sample.lat, sample.lng)
+        var marker = new google.maps.Marker({
+        position: position,            
+            map: map,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 4
+            },            
+        });
+
+        var infowindow = new google.maps.InfoWindow({
+            content: 'value : ' + sample.value + ' - date : ' + sample.datetime
+        });
+  
+        marker.addListener('click', function() {
+            infowindow.open(map, marker);
+        });
+
+        marker.infowindow = infowindow;        
+        sample.marker = marker;       
+    }  
 
     /* Communes *****************************************************************************************************
     |
@@ -205,14 +248,9 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
     // draw cell.
     $scope.drawCell = function(cell, map) {  
-        
-        var cellPath = [
-            {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng},
-            {lat: cell.top_left_lat, lng: cell.top_left_lng},
-            {lat: cell.top_right_lat, lng: cell.top_right_lng},
-            {lat: cell.bottom_right_lat, lng: cell.bottom_right_lng},
-            {lat: cell.bottom_left_lat, lng: cell.bottom_left_lng}
-        ];        
+        var cellPath = cell.path;
+        console.log(cell.path);
+        cell.path.push(cell.path[0]);        
 
         var polygon = new google.maps.Polygon({
             paths: cellPath,
@@ -248,7 +286,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
     $scope.cellMouseOut = function(cell) {
         cell.polygon.setOptions({
-            strokeOpacity: 0.5,
+            strokeOpacity: 0.2,
             strokeWeight: 0.5,
         });
     }
