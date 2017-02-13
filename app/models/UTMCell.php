@@ -17,6 +17,78 @@ class UTMCell extends Cell {
         return $this->hasMany('CellPath');
     }
 
+    public static function createFromUTMSample($utm) {
+    	// to latLng.
+		$l = $utm->toLatLng();
+
+		$index_x = floor($utm->getX()/self::SIDE_SIZE);
+		$index_y = floor($utm->getY()/self::SIDE_SIZE);
+		$index_x = $index_x*self::SIDE_SIZE;
+		$index_y = $index_y*self::SIDE_SIZE;
+
+    	$p = new PHPCoord\UTMRef($index_x+(self::SIDE_SIZE/2), $index_y,+(self::SIDE_SIZE/2), $utm->getLatZone(),$utm->getLngZone());
+		$l = $p->toLatLng();
+
+		// center
+		$cell = new UTMCell();
+		$cell->center_lat = $l->getLat();
+		$cell->center_lng = $l->getLng();
+		$cell->index_x = $index_x;
+		$cell->index_y = $index_y;
+		$cell->utm_lat_zone = $utm->getLatZone();
+		$cell->utm_lng_zone = $utm->getLngZOne();
+		$cell->save();
+
+		// path.
+		$p = new PHPCoord\UTMRef($index_x, $index_y, 0, $utm->getLatZone(),$utm->getLngZone());
+		$l = $p->toLatLng();
+
+		$cellPath = new CellPath();
+		$cellPath->cell_id = $cell->id;
+		$cellPath->utm_x = $p->getX();
+		$cellPath->utm_y = $p->getY();
+		$cellPath->lat = $l->getLat();
+		$cellPath->lng = $l->getLng();
+		$cellPath->save();
+
+		$p = new PHPCoord\UTMRef($index_x + (self::SIDE_SIZE-1), $index_y, 0, $utm->getLatZone(),$utm->getLngZone());
+		$l = $p->toLatLng();
+
+		$cellPath = new CellPath();
+		$cellPath->cell_id = $cell->id;
+		$cellPath->utm_x = $index_x+(self::SIDE_SIZE-1);
+		$cellPath->utm_y = $index_y;
+		$cellPath->lat = $l->getLat();
+		$cellPath->lng = $l->getLng();
+		$cellPath->save();
+
+		$p = new PHPCoord\UTMRef($index_x+(self::SIDE_SIZE-1), $index_y+(self::SIDE_SIZE-1), 0, $utm->getLatZone(),$utm->getLngZone());
+		$l = $p->toLatLng();
+
+		$cellPath = new CellPath();
+		$cellPath->cell_id = $cell->id;
+		$cellPath->utm_x = $index_x+(self::SIDE_SIZE-1);
+		$cellPath->utm_y = $index_y+(self::SIDE_SIZE-1);
+		$cellPath->lat = $l->getLat();
+		$cellPath->lng = $l->getLng();
+		$cellPath->save();
+				
+
+		$p = new PHPCoord\UTMRef($index_x, $index_y+(self::SIDE_SIZE-1), 0, $utm->getLatZone(),$utm->getLngZone());
+		$l = $p->toLatLng();
+
+		$cellPath = new CellPath();
+		$cellPath->cell_id = $cell->id;
+		$cellPath->utm_x = $index_x;
+		$cellPath->utm_y = $index_y+(self::SIDE_SIZE-1);
+		$cellPath->lat = $l->getLat();
+		$cellPath->lng = $l->getLng();
+		$cellPath->save();
+
+		return $cell;				
+
+    }
+
     public static function makeDefaultCells() {
     	$y = 6250000;
 		for ($i=0; $i < 10; $i++) { 
@@ -82,48 +154,11 @@ class UTMCell extends Cell {
 				$cellPath->utm_y = $y+(self::SIDE_SIZE-1);
 				$cellPath->lat = $l->getLat();
 				$cellPath->lng = $l->getLng();
-				$cellPath->save();
-				
+				$cellPath->save();	
 
-				
-
-				
-
-				/*$p = new PHPCoord\UTMRef($x, $y, 0, 'H', 19);
-				$ps = $p->toLatLng();	
-
-				$p = new PHPCoord\UTMRef($x, $y, 0, 'H', 19);
-				$ps = $p->toLatLng();
-
-				$p = new PHPCoord\UTMRef($x, $y, 0, 'H', 19);
-				$ps = $p->toLatLng();
-
-				$p = new PHPCoord\UTMRef($x, $y, 0, 'H', 19);
-				$ps = $p->toLatLng();
-
-				$punto = array(
-					"lat" => $ps->getLat(),
-					"lng" => $ps->getLng()						
-				);*/
-
-				$x = $x+self::SIDE_SIZE;			
-
-				//array_push($markers, $punto);
+				$x = $x+self::SIDE_SIZE;				
 			}
 			$y = $y+self::SIDE_SIZE;
 		}
     }
-
-
-	/*$comments = array(
-    new Comment(array('message' => 'A new comment.')),
-    new Comment(array('message' => 'Another comment.')),
-    new Comment(array('message' => 'The latest comment.'))
-	);
-
-	$post = Post::find(1);
-
-	$post->comments()->saveMany($comments);*/
-
-	
 }

@@ -30,7 +30,7 @@ class DbInit extends Migration {
             $table->integer('value');
             $table->decimal('lat', 10, 7);
             $table->decimal('lng', 10, 7);   
-            $table->integer('cell_code');         
+            $table->integer('cell_id');         
             $table->datetime('datetime')->nullable()->default(null);
         });
        
@@ -123,7 +123,7 @@ class DbInit extends Migration {
                    
         });
 
-        UTMCell::makeDefaultCells();
+        //UTMCell::makeDefaultCells();
 	}
 
 	/**

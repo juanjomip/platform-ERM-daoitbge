@@ -38,7 +38,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
                 console.log(response.data.markers);
                 $scope.drawCells($scope.cells);
                 //$scope.createUTMS(response.data.markers);
-                //$scope.createMarkers($scope.samples);                
+                $scope.createMarkers($scope.samples);                
                 //$scope.drawCommunes($scope.communes);                          
             },
             function error(response) {

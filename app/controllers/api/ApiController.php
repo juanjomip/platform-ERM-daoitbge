@@ -139,7 +139,7 @@ class ApiController extends BaseController {
 		}
 		return array(
 			//'markers' => $markers,
-			//'samples' => $samples,
+			'samples' => Sample::all(),
 			'cells' => $cells,
 			//'communes' => $communes
 		);
@@ -173,10 +173,10 @@ class ApiController extends BaseController {
 	}
 
 	public function getSample($lat, $lng){
-		$sample = new UnprocessedSample();
+		$sample = new Sample();
 		$sample->lat = $lat;
 		$sample->lng = $lng;
-		$sample->assignCell();
+		$sample->assignUTMCell();
 	}
 
 	public function getResetdb(){
