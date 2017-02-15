@@ -28,21 +28,41 @@ class Cell extends Eloquent {
 	private function setBottomLeft() {
 		$this->bottom_left_lat = $this->lat_index*self::SIDE_SIZE;
 		$this->bottom_left_lng = $this->lng_index*self::SIDE_SIZE;
+		$path = new CellPath();
+		$path->lat = $this->bottom_left_lat;
+		$path->lng = $this->bottom_left_lng;
+		$path->cell_id = $this->id;
+		$path->save();
 	}
 
 	private function setTopLeft() {
 		$this->top_left_lat = $this->bottom_left_lat;
 		$this->top_left_lng = $this->bottom_left_lng + ( self::SIDE_SIZE - 0.0000001 );
+		$path = new CellPath();
+		$path->lat = $this->top_left_lat;
+		$path->lng = $this->top_left_lng;
+		$path->cell_id = $this->id;
+		$path->save();
 	}
 
 	private function setTopRight() {
 		$this->top_right_lat = $this->top_left_lat + ( self::SIDE_SIZE - 0.0000001 );
 		$this->top_right_lng = $this->top_left_lng;
+		$path = new CellPath();
+		$path->lat = $this->top_right_lat;
+		$path->lng = $this->top_left_lng;
+		$path->cell_id = $this->id;
+		$path->save();
 	}
 
 	private function setBootmRight() {
 		$this->bottom_right_lat = $this->top_right_lat;
 		$this->bottom_right_lng = $this->bottom_left_lng;
+		$path = new CellPath();
+		$path->lat = $this->bottom_right_lat;
+		$path->lng = $this->bottom_left_lng;
+		$path->cell_id = $this->id;
+		$path->save();
 	}
 
 	private function setVertices() {
@@ -66,6 +86,7 @@ class Cell extends Eloquent {
 		$cell = new Cell();
 		$cell->lat_index = $lat_index;
 		$cell->lng_index = $lng_index;
+		$cell->save();
 		$cell->setVertices();
 		$cell->setCenter();
 		$cell->save();
@@ -86,35 +107,35 @@ class Cell extends Eloquent {
 
 	public function updateMeasurement($sample) {
 		// if measurement already are in database just update, else save first measurement.
- 		if($measurement = DB::table('cell_measurement')->where('date', $sample->date)->where('cell_id', $this->id)->first()) {
+ 		if($cellMeasurement = CellMeasurement::where('date', $sample->date)->where('cell_id', $this->id)->first()) {
 			// calculates average.
- 			$newValue = ($measurement->quantity*$measurement->value + $sample->value)/($measurement->quantity +1);			
-			$measurement->quantity = $measurement->quantity+1;			
+ 			$newValue = ($cellMeasurement->quantity*$cellMeasurement->value + $sample->value)/($cellMeasurement->quantity +1);			
+			$cellMeasurement->quantity = $cellMeasurement->quantity+1;			
 			DB::table('cell_measurement')->where('date', $sample->date)->where('cell_id', $this->id)->update(
 				array(
 					'cell_id' => $this->id,					
 					'value' => $newValue,
-					'quantity' => $measurement->quantity
+					'quantity' => $cellMeasurement->quantity
 				)
 			);			
 		} else {
-			DB::table('cell_measurement')->insert(
-				array(
-					'cell_id' => $this->id,
-					'date' => $sample->date,
-					'value' => $sample->value,
-					'quantity' => 1
-				)
-			);			
+			$cellMeasurement = new CellMeasurement();
+			$cellMeasurement->cell_id = $this->id;
+			$cellMeasurement->date = $sample->date;
+			$cellMeasurement->value = $sample->value;
+			$cellMeasurement->quantity = 1;
+			$cellMeasurement->save();						
 		}
-		$this->updatePolygons();
+		$this->updatePolygons($cellMeasurement);
 	}
 
-	public function updatePolygons() {
-		$polygons = Polygon::join('cell_polygon', 'cell_polygon.polygon_id', '=', 'polygon.id')->where('cell_polygon.cell_id', $this->id)->get();
+	public function updatePolygons($cellMeasurement) {
+		$polygons = Polygon::select('polygon.id')->join('cell_polygon', 'cell_polygon.polygon_id', '=', 'polygon.id')->where('cell_polygon.cell_id', $this->id)->get();
 		foreach ($polygons as $polygon) {
-			$polygon->updateMeasurement();
+			$polyg = Polygon::find($polygon->id);
+			$polyg->updateMeasurement($cellMeasurement);
 		}
+	}
 
 	public static function merc_x($lon)
 	{

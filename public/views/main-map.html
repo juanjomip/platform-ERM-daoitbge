@@ -1,13 +1,37 @@
 <div>
 <button ng-if="!pageStatus.showCommunes" ng-click="showCommunes(communes)">Mostrar comunas</button>
+
 <button ng-if="pageStatus.showCommunes" ng-click="hideCommunes(communes)">Ocultar comunas</button>
 
-|
-<input type="date" ng-model="minDate">
-<input type="date" ng-model="maxDate">
-<button ng-click="query()"> Consultar </button>
 <button ng-if="!pageStatus.showCells" ng-click="showCells(cells)">Mostrar celdas</button>
+
 <button ng-if="pageStatus.showCells" ng-click="hideCells(cells)">Ocultar celdas</button>
+<br>
+
+<input type="date" ng-model="queryData.minDate">
+<br>
+<input type="date" ng-model="queryData.maxDate">
+
+<br>
+    <select name="singleSelect" id="singleSelect" ng-model="queryData.commune_id">
+      <option value="">---Please select---</option> <!-- not selected / blank option -->
+      <option ng-repeat="comuna in communes" value="{{comuna.id}}">{{comuna.name}}</option> <!-- interpolation -->
+      <option value="option-2">Option 2</option>
+    </select><br>
+
+
+
+<button ng-click="query()"> Consultar </button>
+<br>
+
+{{queryData}}
+
+
+
+
+
+
+
 
 
 <div id="map"></div>

@@ -33,7 +33,7 @@ class ApiController extends BaseController {
 			$cell->bottom_right_lat = (float) $cell->bottom_right_lat;
 			$cell->bottom_right_lng	= (float) $cell->bottom_right_lng;			
 		}        
-
+	*/
 		$polygons = Polygon::all();
 		foreach ($polygons as $polygon) {
 			$polygon->center_lat = (float) $polygon->center_lat;
@@ -43,7 +43,7 @@ class ApiController extends BaseController {
 				$point->lat = (float) $point->lat;
 				$point->lng = (float) $point->lng;
 			}
-		}*/
+		}
 
 		//$bandas = ['X', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N'];
 		//$husos = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
@@ -142,9 +142,11 @@ class ApiController extends BaseController {
 				$point->lng = (double) $point->lng;
 			}
 		}
+
+
 		return array(
 			//'markers' => $markers,
-			'samples' => Sample::all(),
+			'samples' => UnprocessedSample::all(),
 			'cells' => $cells,
 
 			'communes' => $polygons
@@ -155,19 +157,16 @@ class ApiController extends BaseController {
 	public function getPolygoncells($id) {
 		$polygon = Polygon::find($id);
 
-		$cells = Cell::join('cell_polygon', 'cell.id', '=', 'cell_polygon.cell_id')->where('cell_polygon.polygon_id', $polygon->id)->get();
+		$cells = DB::table('cell_polygon')->join('cell', 'cell_polygon.cell_id', '=', 'cell.id')->select('cell.id', 'center_lat', 'center_lng')->where('cell_polygon.polygon_id', $id)->get();
 		foreach ($cells as $cell) {
-			$cell->lat_index = (float) $cell->lat_index;
-			$cell->lng_index = (float) $cell->lng_index;
-			$cell->bottom_left_lat = (float) $cell->bottom_left_lat;
-			$cell->bottom_left_lng = (float) $cell->bottom_left_lng;
-			$cell->top_left_lat = (float) $cell->top_left_lat;
-			$cell->top_left_lng = (float) $cell->top_left_lng;
-			$cell->top_right_lat = (float) $cell->top_right_lat;
-			$cell->top_right_lng = (float) $cell->top_right_lng;
-			$cell->bottom_right_lat = (float) $cell->bottom_right_lat;
-			$cell->bottom_right_lng	= (float) $cell->bottom_right_lng;			
-		}       
+			$cell->center_lat = (double) $cell->center_lat;
+			$cell->center_lng = (double) $cell->center_lng;
+			$cell->path = CellPath::where('cell_id', $cell->id)->select('lat', 'lng')->get();
+			foreach ($cell->path as $point) {
+				$point->lat = (double) $point->lat;
+				$point->lng = (double) $point->lng;
+			}
+		}
 		return array('cells' => $cells);
 	}
 
@@ -244,6 +243,22 @@ class ApiController extends BaseController {
 		for ($i=-18646; $i < -18571; $i++) { 
 			Cell::createAndConfig($i, -39277);
 		}
+	}
+
+	public function getQuery($minDate, $maxDate, $polygon_id = null, $cell_id = null) {
+		$params = array(
+			'min_date' => $minDate,
+			'max_date' => $maxDate,
+			'polygon_id' => $polygon_id,
+			'cell_id' => $cell_id
+		);
+
+		
+		return Query::start($params);
+		
+
+		
+
 	}
 
 }

@@ -10,6 +10,20 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         showCommunes: true,
         showCells: true       
     }  
+    
+    $scope.queryData = {
+        'maxDate':'2017-12-31',
+        'minDate': '2016-01-01',
+        'commune_id' : undefined,
+        'cell_id' : undefined,
+    }
+
+
+    $scope.maxDate = '2016-01-01';
+    $scope.minDate = '2016-01-01';
+    $scope.commune_id = 0;
+    $scope.cell_id = 0;
+    console.log($scope.minDate);
 
     var santiago = new google.maps.LatLng(-33.465, 289.35)
     $rootScope.map = new google.maps.Map(document.getElementById('map'), {
@@ -24,8 +38,20 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     });
 
     $scope.query = function() {
-        console.log($scope.minDate);
-        console.log($scope.maxDate);
+        console.log($scope.queryData);
+        $http.get('/api/query/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + $scope.queryData.commune_id + '/' + $scope.queryData.cell_id)
+            .then(function(response) {           
+                console.log(response); 
+                if(response.data.query == 'start') {
+                    $scope.communes = response.data.data;
+                    $scope.drawCommunes($scope.communes);
+                }                   
+
+            },
+            function error(response) {
+                console.log(response);
+            }
+        );         
     }
 
     // get all samples from backend.
@@ -34,27 +60,28 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
             .then(function(response) {           
                 $scope.samples = response.data.samples;
                 $scope.cells = response.data.cells;
-                
+                //console.log($scope.cells);
                 $scope.communes = response.data.communes;
-<<<<<<< HEAD
+                console.log($scope.communes);
                 $scope.drawCells($scope.cells);
                 //$scope.createMarkers($scope.samples);                
-                $scope.drawCommunes($scope.communes);                          
-=======
+                $scope.drawCommunes($scope.communes);
 
-                console.log('cells');
-                console.log(response.data.cells);
 
-                console.log('markers');
-                console.log(response.data.markers);
+
+                //console.log('cells');
+                //console.log(response.data.cells);
+
+                //console.log('markers');
+                //console.log(response.data.markers);
                 $scope.drawCells($scope.cells);
                 //$scope.createUTMS(response.data.markers);
-                $scope.createMarkers($scope.samples);                
+                //$scope.createMarkers($scope.samples);                
                 //$scope.drawCommunes($scope.communes);                          
->>>>>>> 63f52bfd48e7c5c21b22424737ebfa4059608583
+
             },
             function error(response) {
-                console.log(response);
+                //console.log(response);
             }
         );         
     }
@@ -62,13 +89,13 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     $scope.getCommuneCells = function (commune_id) {        
         $http.get('/api/polygoncells/' + commune_id)
             .then(function(response) {
-                console.log(response);                 
+                //console.log(response);                 
                 $scope.hideCells($scope.cells);
                 $scope.cells = response.data.cells;
                 $scope.drawCells($scope.cells);                    
             },
             function error(response) {
-                console.log(response);
+                //console.log(response);
             }
         );         
     }
@@ -147,12 +174,26 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     }
 
     $scope.drawCommune = function(commune, map) {
+        var color = '#000000';
+        if(commune.value != null && commune.path != undefined) {
+            if(commune.value <= 25)
+                color = '#3ADF00';
+            else if(commune.value > 25 && commune.value <= 50)
+                color = '#F7FE2E';
+            else if(commune.value > 50 && commune.value <= 75)
+                color = '#FF8000';
+            else if(commune.value > 75)
+                color = '#FF0000';
+            else
+                color = '#000000';
+
+        }
         var polygon = new google.maps.Polygon({
             paths: commune.path,
-            strokeColor: '#000000',
+            strokeColor: color,
             strokeOpacity: 0.5,
             strokeWeight: 0.5,
-            fillColor: '#000000',
+            fillColor: color,
             fillOpacity: 0.1
         });
 
@@ -188,6 +229,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     }
 
     $scope.selectCommune = function(commune) {
+        console.log(commune.name);
         $scope.getCommuneCells(commune.id);               
         var latLng = new google.maps.LatLng(commune.center_lat,commune.center_lng)
         $rootScope.map.panTo(latLng);
@@ -234,6 +276,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         commune.polygon.setMap(map);
     }
 
+
     /* Cells *****************************************************************************************************
     |
     |
@@ -249,7 +292,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     // draw cell.
     $scope.drawCell = function(cell, map) {  
         var cellPath = cell.path;
-        console.log(cell.path);
+        //console.log(cell.path);
         cell.path.push(cell.path[0]);        
 
         var polygon = new google.maps.Polygon({
@@ -341,7 +384,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     |
     |****************************************************************************************************************/
 
-    $scope.getSamples();
-
+    //$scope.getSamples();
+    $scope.query();
 });
 

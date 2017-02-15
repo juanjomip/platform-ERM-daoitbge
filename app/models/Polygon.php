@@ -70,14 +70,14 @@ class Polygon extends Eloquent {
 			return false;
 	}
 
-	public function updateMeasurement($cell) {
+	public function updateMeasurement($cellMeasurement) {
 		
 		// if measurement already are in database just update, else save first measurement.
- 		if($measurement = DB::table('polygon_measurement')->where('date', $cell->date)->where('polygon_id', $this->id)->first()) {
+ 		if($measurement = DB::table('polygon_measurement')->where('date', $cellMeasurement->date)->where('polygon_id', $this->id)->first()) {
 			// calculates average.
- 			$newValue = ($measurement->quantity*$measurement->value + $sample->value)/($measurement->quantity +1);			
+ 			$newValue = ($measurement->quantity*$measurement->value + $cellMeasurement->value)/($measurement->quantity +1);			
 			$measurement->quantity = $measurement->quantity+1;			
-			DB::table('polygon_measurement')->where('date', $sample->date)->where('polygon_id', $this->id)->update(
+			DB::table('polygon_measurement')->where('date', $cellMeasurement->date)->where('polygon_id', $this->id)->update(
 				array(
 					'polygon_id' => $this->id,					
 					'value' => $newValue,
@@ -88,8 +88,8 @@ class Polygon extends Eloquent {
 			DB::table('polygon_measurement')->insert(
 				array(
 					'polygon_id' => $this->id,
-					'date' => $cell->date,
-					'value' => $cell->value,
+					'date' => $cellMeasurement->date,
+					'value' => $cellMeasurement->value,
 					'quantity' => 1
 				)
 			);			

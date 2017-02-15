@@ -30,7 +30,7 @@ class TableUnprocessedsample extends Migration {
             $table->integer('value');
             $table->decimal('lat', 10, 7);
             $table->decimal('lng', 10, 7);   
-            $table->integer('cell_code');         
+            $table->integer('cell_id');         
             $table->date('date')->nullable()->default(null);
         });
        
@@ -115,7 +115,8 @@ class TableUnprocessedsample extends Migration {
             $table->integer('polygon_id')->unsigned()->nullable();
             $table->foreign('polygon_id')->references('id')->on('polygon');
             $table->date('date');
-            $table->integer('value');            
+            $table->integer('value');
+            $table->integer('quantity');          
                    
         });
 

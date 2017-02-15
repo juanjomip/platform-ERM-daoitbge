@@ -1,8 +1,9 @@
 <?php
 
-class Sample extends Eloquent {
+class Sample {
+//class Sample extends Eloquent {
 	
-	protected $table = 'sample';
+	/*protected $table = 'sample';
 
 	public $timestamps = false;
 	
@@ -28,5 +29,5 @@ class Sample extends Eloquent {
 			$this->cell_id = $cell->id;
 			$this->save();
 		}
-	}
+	}*/
 }
