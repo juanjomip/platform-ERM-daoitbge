@@ -12,6 +12,26 @@ class ApiController extends BaseController {
 		
 	}	
 
+	public function getCommunes($minDate, $maxDate) {
+		$params = array('min_date' => $minDate, 'max_date' => $maxDate);
+		$polygons = Polygon::all();
+		foreach ($polygons as $polygon) {
+			$polygon->summary = $polygon->summary($params);
+			$polygon->quantity = (float) $polygon->quantity($params);
+			$polygon->summary = ($polygon->summary != null) ? (float) $polygon->summary : null;
+			$polygon->center_lat = (float) $polygon->center_lat;
+			$polygon->center_lng = (float) $polygon->center_lng;
+			$polygon->path = PolygonPath::where('polygon_id', $polygon->id)->get();
+			foreach ($polygon->path as $point) {
+				$point->lat = (float) $point->lat;
+				$point->lng = (float) $point->lng;
+			}
+		}
+		return array(
+			'communes' => $polygons
+		);
+	}
+
 	public function getSamples(){
 		/*$samples = UnprocessedSample::all();
 		foreach ($samples as $sample) {
@@ -34,16 +54,7 @@ class ApiController extends BaseController {
 			$cell->bottom_right_lng	= (float) $cell->bottom_right_lng;			
 		}        
 	*/
-		$polygons = Polygon::all();
-		foreach ($polygons as $polygon) {
-			$polygon->center_lat = (float) $polygon->center_lat;
-			$polygon->center_lng = (float) $polygon->center_lng;
-			$polygon->path = PolygonPath::where('polygon_id', $polygon->id)->get();
-			foreach ($polygon->path as $point) {
-				$point->lat = (float) $point->lat;
-				$point->lng = (float) $point->lng;
-			}
-		}
+		
 
 		//$bandas = ['X', 'W', 'V', 'U', 'T', 'S', 'R', 'Q', 'P', 'N'];
 		//$husos = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
@@ -249,16 +260,9 @@ class ApiController extends BaseController {
 		$params = array(
 			'min_date' => $minDate,
 			'max_date' => $maxDate,
-			'polygon_id' => $polygon_id,
-			'cell_id' => $cell_id
-		);
-
-		
-		return Query::start($params);
-		
-
-		
-
+			'polygon_id' => ($polygon_id == 'undefined') ? null : $polygon_id,
+			'cell_id' => ($cell_id == 'undefined') ? null : $cell_id
+		);		
+		return Query::make($params);
 	}
-
 }

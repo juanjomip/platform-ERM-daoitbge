@@ -6,22 +6,17 @@
 	<style>
        #map {
         height: 800px;
-        width: 100%;
+        width: 50%;
+        float: right;
        }
     </style>
 	
 </head>
 <body ng-app="app" ng-controller="MainCtrl">
-	<li ui-sref-active="active">
-        <a ui-sref="main-map" ><i></i><span >Main Map</span></a>
-    </li>
-    <li ui-sref-active="active">
-        <a ui-sref="charts" ><i></i><span >Charts</span></a>
-    </li>
+	
 
     <div class="welcome">		
-		<h1>Platform-ERM-Prototype</h1>
-		
+		<h1>Platform-ERM-Prototype</h1>		
 	</div>
 
     <div ui-view></div>

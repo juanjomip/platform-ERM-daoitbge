@@ -166,4 +166,24 @@ class Cell extends Eloquent {
 	    return array('x'=>Cell::merc_x($x),'y'=>Cell::merc_y($y));
 
 	}
+
+	// return all mesasurement
+	public function memeasurements($params) {
+		$cell_measurement = CellMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('cell_id', $this->id)->select('date', 'value');
+		$mesaurements = $cell_measurement->get();
+		return $mesaurements;
+	}
+
+	// return AVG measurement.
+	public function summary($params) {
+		$cell_measurement = CellMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('cell_id', $this->id)->select('date', 'value');
+		$avg = $cell_measurement->avg('value');
+		return $avg;
+	}
+
+	public function quantity($params) {
+		$cell_measurement = CellMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('cell_id', $this->id)->select('date', 'value', 'quantity');
+		$avg = $cell_measurement->sum('quantity');
+		return $avg;
+	}
 }

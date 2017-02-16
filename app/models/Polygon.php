@@ -7,6 +7,7 @@ class Polygon extends Eloquent {
 	
 	protected $table = 'polygon';
 
+	
 	public static function santiagoFromKml(){
 		$json = json_decode(Kml::Polygons);	
 		foreach ($json->kml->Document->Folder[0]->Placemark as $polygon_data) {					
@@ -94,6 +95,27 @@ class Polygon extends Eloquent {
 				)
 			);			
 		}		
+	}
+
+	// return all mesasurement
+	public function measurements($params) {
+		$cell_measurement = PolygonMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
+		$mesaurements = $cell_measurement->get();
+		return $mesaurements;
+	}
+
+	// return AVG measurement.
+	public function summary($params) {
+		$polygon_measurement = PolygonMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
+		$avg = $polygon_measurement->avg('value');
+		return $avg;
+	}
+
+	// return AVG measurement.
+	public function quantity($params) {
+		$polygon_measurement = PolygonMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
+		$avg = $polygon_measurement->sum('quantity');
+		return $avg;
 	}
 
 }

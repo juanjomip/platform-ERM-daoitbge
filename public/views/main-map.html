@@ -1,38 +1,62 @@
 <div>
-<button ng-if="!pageStatus.showCommunes" ng-click="showCommunes(communes)">Mostrar comunas</button>
 
-<button ng-if="pageStatus.showCommunes" ng-click="hideCommunes(communes)">Ocultar comunas</button>
+	<div style="float:left">
+		<button ng-if="!pageStatus.showCommunes" ng-click="showCommunes(communes)">Mostrar comunas</button>
 
-<button ng-if="!pageStatus.showCells" ng-click="showCells(cells)">Mostrar celdas</button>
+		<button ng-if="pageStatus.showCommunes" ng-click="hideCommunes(communes)">Ocultar comunas</button>
 
-<button ng-if="pageStatus.showCells" ng-click="hideCells(cells)">Ocultar celdas</button>
+		<button ng-if="!pageStatus.showCells" ng-click="showCells(cells)">Mostrar celdas</button>
+
+		<button ng-if="pageStatus.showCells" ng-click="hideCells(cells)">Ocultar celdas</button>
+		<br>
+
+		<input type="date" ng-model="queryData.minDate">
+		<br>
+		<input type="date" ng-model="queryData.maxDate">
+
+		<br>
+		    <select name="singleSelect" id="singleSelect" ng-model="queryData.commune_id">
+		      <option value="">---Please select---</option> <!-- not selected / blank option -->
+		      <option ng-repeat="comuna in communes" value="{{comuna.id}}">{{comuna.name}}</option> <!-- interpolation -->
+		      <option value="option-2">Option 2</option>
+		    </select><br>
+
+
 <br>
+		<button ng-click="query()"> Consultar </button>
+		<br>
 
-<input type="date" ng-model="queryData.minDate">
-<br>
-<input type="date" ng-model="queryData.maxDate">
+		{{queryData}}
 
-<br>
-    <select name="singleSelect" id="singleSelect" ng-model="queryData.commune_id">
-      <option value="">---Please select---</option> <!-- not selected / blank option -->
-      <option ng-repeat="comuna in communes" value="{{comuna.id}}">{{comuna.name}}</option> <!-- interpolation -->
-      <option value="option-2">Option 2</option>
-    </select><br>
+		<button ng-if="queryData.commune_id != undefined" ng-click="communesQuery()">Atras</button>
+		<table ng-if="queryData.commune_id == undefined" border="1">
+			<tr >
+			    <th>Comuna</th>
+			    <th>Medición</th> 
+			    <th>Mediciones</th>
+		 	 </tr>
+		  	<tr ng-click="selectCommune(commune)" ng-repeat="commune in communes">
+			    <td>{{commune.name}} </td>
+			    <td>{{commune.summary}}</td> 
+			    <td>{{commune.quantity}}</td>
+		  	</tr>	  	
+		</table>
 
+		<table border="1">
+			<tr >
+			    <th>Fecha</th>
+			    <th>Medición</th> 
+			    <th>Mediciones</th>
+		 	 </tr>
+		  	<tr ng-repeat="commune_measurement in commune.measurements">
+			    <td>{{commune_measurement.date}} </td>
+			    <td>{{commune_measurement.value}}</td> 
+			    <td>{{commune_measurement.quantity}}</td>
+		  	</tr>	  	
+		</table>		
 
-
-<button ng-click="query()"> Consultar </button>
-<br>
-
-{{queryData}}
-
-
-
-
-
-
-
-
-
-<div id="map"></div>
+	</div>
+	<div  id="map">
+		
+	</div>
 </div>
