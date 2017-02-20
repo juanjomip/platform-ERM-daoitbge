@@ -18,12 +18,20 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         'cell_id' : undefined,
     }
 
+    $scope.queryResult = {
+        'maxDate':'2017-12-31',
+        'minDate': '2016-01-01',
+        'commune_id' : undefined,
+        'cell_id' : undefined,
+        'commune_name' : 'Todas las comunas'
+    }
+
 
     $scope.maxDate = '2016-01-01';
     $scope.minDate = '2016-01-01';
     $scope.commune_id = 0;
     $scope.cell_id = 0;
-    console.log($scope.minDate);
+    //console.log($scope.minDate);
 
     var santiago = new google.maps.LatLng(-33.465, 289.35)
     $rootScope.map = new google.maps.Map(document.getElementById('map'), {
@@ -37,6 +45,10 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         draggable: true
     });
 
+
+
+
+
     $scope.communesQuery = function() {
         $scope.queryData.commune_id = undefined;
         $scope.query();
@@ -48,29 +60,31 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         if($scope.commune != undefined)
             $scope.deleteCommune($scope.commune);       
         $http.get('/api/query/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + $scope.queryData.commune_id + '/' + $scope.queryData.cell_id)
-            .then(function(response) {           
-                console.log(response.data); 
+            .then(function(response) {
+                           
+                //console.log(response.data); 
                 if(response.data.communes != undefined){
+                    $scope.queryResult.commune_name = 'Todas las comunas'
                     $scope.communes = response.data.communes;
                     $scope.drawCommunes($scope.communes);
                 }
                 if(response.data.commune != undefined) {
-
+                    $scope.queryResult.commune_name = response.data.commune.name;
                     $scope.commune = response.data.commune;
                     $scope.drawCommune($scope.commune, $rootScope.map);
                     $scope.cells = $scope.commune.cells;
                     $scope.drawCells($scope.cells);
-                    console.log($scope.commune);
+                    //console.log($scope.commune);
                 }
                 /*if(response.data.query == 'start') {
                     
-                    console.log($scope.communes);
+                    //console.log($scope.communes);
                     
                 }*/                  
 
             },
             function error(response) {
-                console.log(response);
+                //console.log(response);
             }
         );         
     }
@@ -81,20 +95,20 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
             .then(function(response) {           
                 $scope.samples = response.data.samples;
                 $scope.cells = response.data.cells;
-                //console.log($scope.cells);
+                ////console.log($scope.cells);
                 $scope.communes = response.data.communes;
-                console.log($scope.communes);
+                //console.log($scope.communes);
                 $scope.drawCells($scope.cells);
                 //$scope.createMarkers($scope.samples);                
                 $scope.drawCommunes($scope.communes);
 
 
 
-                //console.log('cells');
-                //console.log(response.data.cells);
+                ////console.log('cells');
+                ////console.log(response.data.cells);
 
-                //console.log('markers');
-                //console.log(response.data.markers);
+                ////console.log('markers');
+                ////console.log(response.data.markers);
                 $scope.drawCells($scope.cells);
                 //$scope.createUTMS(response.data.markers);
                 //$scope.createMarkers($scope.samples);                
@@ -102,7 +116,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
             },
             function error(response) {
-                //console.log(response);
+                ////console.log(response);
             }
         );         
     }
@@ -112,13 +126,13 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     $scope.getCommuneCells = function (commune_id) {        
         $http.get('/api/polygoncells/' + commune_id)
             .then(function(response) {
-                //console.log(response);                 
+                ////console.log(response);                 
                 $scope.hideCells($scope.cells);
                 $scope.cells = response.data.cells;
                 $scope.drawCells($scope.cells);                    
             },
             function error(response) {
-                //console.log(response);
+                ////console.log(response);
             }
         );         
     }
@@ -219,9 +233,9 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     }
 
     $scope.drawCommune = function(commune, map) {        
-        var color = '#000000';
+        var color = '#6E6E6E';
         if(commune.summary != null && commune.path != undefined) {
-            console.log(commune);
+            //console.log(commune);
             if(commune.summary <= 25)
                 color = '#3ADF00';
             else if(commune.summary > 25 && commune.summary <= 50)
@@ -233,17 +247,17 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
             else
                 color = '#000000';
         } else {
-            color = '#000000';
+            color = '#6E6E6E';
         }
-        console.log(commune.path);
+        //console.log(commune.path);
 
         var polygon = new google.maps.Polygon({
             paths: commune.path,
             strokeColor: color,
             strokeOpacity: 0.5,
-            strokeWeight: 0.5,
+            strokeWeight: 2,
             fillColor: color,
-            fillOpacity: 0.1
+            fillOpacity: 0.5
         });
 
         polygon.setMap(map);
@@ -266,7 +280,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     $scope.communeMouseOver = function(commune) {
         commune.polygon.setOptions({
             strokeOpacity: 1,
-            strokeWeight: 0.5,
+            strokeWeight: 2,
         });
     }
 
@@ -279,7 +293,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
     $scope.selectCommune = function(commune) {
         $scope.queryData.commune_id = commune.id;
-        console.log(commune.name);                     
+        //console.log(commune.name);                     
         var latLng = new google.maps.LatLng(commune.center_lat,commune.center_lng)
         $rootScope.map.panTo(latLng);
         //$scope.showCommune(commune, $rootScope.map);
@@ -342,12 +356,12 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     // draw cell.
     $scope.drawCell = function(cell, map) {  
         var cellPath = cell.path;
-        //console.log(cell.path);
+        ////console.log(cell.path);
         cell.path.push(cell.path[0]); 
 
         var color = '#000000';
         if(cell.summary != null && cell.path != undefined) {
-            console.log(cell);
+            //console.log(cell);
             if(cell.summary <= 25)
                 color = '#3ADF00';
             else if(cell.summary > 25 && cell.summary <= 50)
@@ -449,13 +463,14 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     $scope.getCommunes = function () {
         $http.get('/api/communes/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate)
             .then(function(response) {
-                console.log(response);               
-                $scope.communes = response.data.communes;                                              
-                $scope.drawCommunes($scope.communes);                      
+                //console.log(response);               
+                $scope.communesList = response.data.communes; 
+                //$scope.communes = response.data.communes;                                              
+                //$scope.drawCommunes($scope.communes);                      
 
             },
             function error(response) {
-                console.log(response);
+                //console.log(response);
             }
         );         
     }
@@ -464,7 +479,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     |
     |
     |****************************************************************************************************************/
-    //$scope.getCommunes();
-    $scope.query();    
+    $scope.getCommunes();
+    //$scope.query();    
 });
 

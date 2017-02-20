@@ -3,21 +3,20 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Index</title>
-	<style>
+	<link rel="stylesheet" href="css/bootstrap.css">
+    <style>
        #map {
-        height: 800px;
-        width: 50%;
-        float: right;
+        height: 600px;
+        width: 100%;
+        
        }
     </style>
 	
 </head>
-<body ng-app="app" ng-controller="MainCtrl">
+<body style="background:#F2F2F2" ng-app="app" ng-controller="MainCtrl">
 	
 
-    <div class="welcome">		
-		<h1>Platform-ERM-Prototype</h1>		
-	</div>
+    
 
     <div ui-view></div>
 
