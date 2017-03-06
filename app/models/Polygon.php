@@ -7,6 +7,52 @@ class Polygon extends Eloquent {
 	
 	protected $table = 'polygon';
 
+	// Query methods ********************************************************************************************************************** //
+	// ok
+	public static function getCommunes($minDate, $maxDate) {
+		$polygons = Polygon::all();
+		foreach ($polygons as $polygon) {		
+			$polygon->value = (int) $polygon->summary($minDate, $maxDate);
+			$polygon->quantity = $polygon->quantity($minDate, $maxDate);			
+			$polygon->path = PolygonPath::where('polygon_id', $polygon->id)->get();
+			foreach ($polygon->path as $point) {
+				$point->lat = (float) $point->lat;
+				$point->lng = (float) $point->lng;
+			}
+		}
+		return array('data' => $polygons);
+	}
+
+	//ok
+	public function getData($minDate, $maxDate) {
+		$data = array();
+		$data['measurements'] = $this->measurements($minDate, $maxDate);
+		$data['value'] = $this->summary($minDate, $maxDate);
+		$data['quantity'] = $this->quantity($minDate, $maxDate);			
+		$data['path'] = PolygonPath::where('polygon_id', $this->id)->get();
+		foreach ($data['path'] as $point) {
+			$point->lat = (float) $point->lat;
+			$point->lng = (float) $point->lng;
+		}
+
+		return array('data' => $data);
+	}
+
+	//ok
+	public function getCells($minDate, $maxDate) {
+		$cells = Cell::join('cell_polygon', 'cell_polygon.cell_id', '=', 'cell.id')->where('cell_polygon.polygon_id', $this->id)->get();
+		foreach ($cells as $cell) {
+			$cell->value = $cell->summary($minDate, $maxDate);
+			$cell->quantity = $cell->quantity($minDate, $maxDate);
+			$cell->path = CellPath::where('cell_id', $cell->id)->get();
+			foreach ($cell->path as $point) {
+				$point->lat = (float) $point->lat;
+				$point->lng = (float) $point->lng;
+			}			
+		}
+		return array('data' => $cells);
+	}
+	// End Query methods *********************************************************************************************************************************** //
 	
 	public static function santiagoFromKml(){
 		$json = json_decode(Kml::Polygons);	
@@ -98,22 +144,22 @@ class Polygon extends Eloquent {
 	}
 
 	// return all mesasurement
-	public function measurements($params) {
-		$cell_measurement = PolygonMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
+	public function measurements($minDate, $maxDate) {
+		$cell_measurement = PolygonMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
 		$mesaurements = $cell_measurement->get();
 		return $mesaurements;
 	}
 
 	// return AVG measurement.
-	public function summary($params) {
-		$polygon_measurement = PolygonMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
+	public function summary($minDate, $maxDate) {
+		$polygon_measurement = PolygonMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
 		$avg = $polygon_measurement->avg('value');
 		return $avg;
 	}
 
 	// return AVG measurement.
-	public function quantity($params) {
-		$polygon_measurement = PolygonMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
+	public function quantity($minDate, $maxDate) {
+		$polygon_measurement = PolygonMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
 		$avg = $polygon_measurement->sum('quantity');
 		return $avg;
 	}

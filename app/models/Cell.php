@@ -25,6 +25,33 @@ class Cell extends Eloquent {
 		'bottom_right_lng'
 	);
 
+	// Query methods ********************************************************************************************************************** //
+	// ok
+	public function getData($minDate, $maxDate) {
+		$data = array();
+		$data['measurements'] = $this->measurements($minDate, $maxDate);
+		$data['value'] = $this->summary($minDate, $maxDate);
+		$data['quantity'] = $this->quantity($minDate, $maxDate);			
+		$data['path'] = CellPath::where('cell_id', $this->id)->get();
+		foreach ($data['path'] as $point) {
+			$point->lat = (float) $point->lat;
+			$point->lng = (float) $point->lng;
+		}
+
+		return array('data' => $data);
+	}
+
+	// ok
+	public function getSamples($minDate, $maxDate) {
+		$samples = UnprocessedSample::where('cell_id', $this->id)
+			->where('date', '>=', $minDate)
+			->where('date', '<=', $maxDate)
+			->get();
+		return array('data' => $samples);
+	}
+
+	// End Query methods *********************************************************************************************************************************** //
+
 	private function setBottomLeft() {
 		$this->bottom_left_lat = $this->lat_index*self::SIDE_SIZE;
 		$this->bottom_left_lng = $this->lng_index*self::SIDE_SIZE;
@@ -168,21 +195,21 @@ class Cell extends Eloquent {
 	}
 
 	// return all mesasurement
-	public function memeasurements($params) {
-		$cell_measurement = CellMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('cell_id', $this->id)->select('date', 'value');
+	public function measurements($minDate, $maxDate) {
+		$cell_measurement = CellMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('cell_id', $this->id)->select('date', 'value');
 		$mesaurements = $cell_measurement->get();
 		return $mesaurements;
 	}
 
 	// return AVG measurement.
-	public function summary($params) {
-		$cell_measurement = CellMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('cell_id', $this->id)->select('date', 'value');
+	public function summary($minDate, $maxDate) {
+		$cell_measurement = CellMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('cell_id', $this->id)->select('date', 'value');
 		$avg = $cell_measurement->avg('value');
 		return $avg;
 	}
 
-	public function quantity($params) {
-		$cell_measurement = CellMeasurement::where('date', '>=', $params['min_date'])->where('date', '<=', $params['max_date'])->where('cell_id', $this->id)->select('date', 'value', 'quantity');
+	public function quantity($minDate, $maxDate) {
+		$cell_measurement = CellMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('cell_id', $this->id)->select('date', 'value', 'quantity');
 		$avg = $cell_measurement->sum('quantity');
 		return $avg;
 	}
