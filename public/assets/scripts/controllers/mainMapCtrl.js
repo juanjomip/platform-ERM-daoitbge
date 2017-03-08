@@ -4,7 +4,8 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     
     $scope.samples = [];
     $scope.cells = [];
-    $scope.communes = [];     
+    $scope.communes = [];   
+    $scope.showPolygonList = true;  
 
     $scope.pageStatus = {
         showCommunes: true,
@@ -157,7 +158,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         });
 
         var infowindow = new google.maps.InfoWindow({
-            content: 'value : ' + sample.value + ' - date : ' + sample.datetime
+            content: 'value : ' + sample.value + ' - date : ' + sample.date
         });
   
         marker.addListener('click', function() {
@@ -221,8 +222,11 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         $scope.communes = [];      
     }
 
-    $scope.deleteCommune =  function(comune) {
-        comune.polygon.setMap(null);
+    $scope.deleteCommune =  function(commune) {
+        commune.polygon.setMap(null);
+        if(commune.cells != undefined){
+            $scope.deleteCells(commune.cells);
+        }
     }
 
     // create markers from samples.
@@ -263,10 +267,10 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
             fillOpacity: 0.5
         });
 
-        polygon.setMap(map);
+        polygon.setMap(null);
         
-        google.maps.event.addListener(polygon, 'click', function (event) {
-            $scope.selectCommune(commune);
+        /*google.maps.event.addListener(polygon, 'click', function (event) {
+            $scope.selectPolygonFromMap(commune);
         });
 
         google.maps.event.addListener(polygon, 'mouseover', function (event) {            
@@ -275,7 +279,8 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
         google.maps.event.addListener(polygon, 'mouseout', function (event) {            
             $scope.communeMouseOut(commune);
-        });  
+        });
+        */  
 
         commune.polygon = polygon;
     }
@@ -322,6 +327,9 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
     $scope.hideCommune = function(commune) {
         commune.polygon.setMap(null);
+        if(commune.cells != undefined) {
+            hideCells(commune.cells);
+        }
     }
 
     $scope.showCommunes = function(communes, exception) {
@@ -387,9 +395,9 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
             fillColor: color,
             fillOpacity: 0.2
         });
-        polygon.setMap(map);
+        polygon.setMap(null);
 
-        google.maps.event.addListener(polygon, 'click', function (event) {
+        /*google.maps.event.addListener(polygon, 'click', function (event) {
             $scope.selectCell(cell);
         });
 
@@ -400,6 +408,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         google.maps.event.addListener(polygon, 'mouseout', function (event) {            
             $scope.cellMouseOut(cell);
         });
+        */
 
         cell.polygon = polygon;
     }
@@ -492,12 +501,14 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     $scope.getPolygons = function () {
         $http.get('/api/polygons/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate)
             .then(function(response) {
+                $scope.showPolygonList = true;
                 console.log(response);
                 $scope.deleteCommunes($scope.communes);
                 if($scope.currentCommune != undefined) {
                     $scope.deleteCommune($scope.currentCommune);
                 }
-                $scope.currentCommune = undefined;         
+                $scope.watch.currentCommune = false; 
+                $scope.currentCommune = undefined;
                 $scope.communes = response.data.data;                                              
                 $scope.drawCommunes($scope.communes);             
 
@@ -508,19 +519,76 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         );         
     }
 
+    
+
     $scope.getPolygon = function (id) {
         $http.get('/api/polygon/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + id)
             .then(function(response) {
-                $scope.hideCommunes($scope.communes);
+                $scope.showPolygonList = false;
+                $scope.showMeasurementsList = true;
+                //$scope.hideCommunes($scope.communes);
                 // delete commune.
                 if($scope.currentCommune != undefined) {
                     $scope.deleteCommune($scope.currentCommune);
                 }
                 
                 $scope.currentCommune = response.data.data;
-                console.log(response);
                 $scope.drawCommune($scope.currentCommune, $rootScope.map);
+                $scope.watch.currentCommune = true;
+                $scope.watch.polygons = false;
+                console.log(response);
+                
                 $scope.panToPolygon($scope.currentCommune.path);
+                $scope.getCells($scope.currentCommune.id);
+                console.log($scope.currentCommune);
+            },
+            function error(response) {
+                console.log(response);
+            }
+        );         
+    }
+
+    $scope.getCells = function (id) {
+        $scope.showMeasurementsList = false;
+        $scope.showCellsList = true;
+        if($scope.currentCommune.cells != undefined) {
+            console.info('cells already loeaded.');
+            return false;
+        }        
+        $http.get('/api/cells/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + id)
+            .then(function(response) {                           
+                $scope.currentCommune.cells = response.data.data;  
+                $scope.drawCells($scope.currentCommune.cells);
+                console.log(response.data.data);
+                $scope.watch.cells = true;                         
+            },
+            function error(response) {
+                console.log(response);
+            }
+        );         
+    }
+
+    $scope.getCell = function (id) {               
+        $http.get('/api/cell/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + id)
+            .then(function(response) {                           
+                console.log(response);
+                $scope.currentCommune.currentCell = response.data.data; 
+                $scope.panToPolygon($scope.currentCommune.currentCell.path);  
+                console.log($scope.currentCommune); 
+                $scope.getSamples($scope.currentCommune.currentCell.id);                  
+            },
+            function error(response) {
+                console.log(response);
+            }
+        );         
+    }
+
+    $scope.getSamples = function (id) {               
+        $http.get('/api/samples/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + id)
+            .then(function(response) {                           
+                console.log(response);
+                $scope.currentCommune.currentCell.samples = response.data.data;    
+                $scope.createMarkers($scope.currentCommune.currentCell.samples);                             
             },
             function error(response) {
                 console.log(response);
@@ -537,6 +605,43 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     |****************************************************************************************************************/
     //$scope.getCommunes();
     //$scope.query();
-    $scope.getPolygons();    
+    $scope.getPolygons();  
+
+
+
+    $scope.watch = {
+        currentCommune: false,
+        polygons: true,
+        cells: false,
+        samples: false,
+        zones: false     
+    }
+
+    $scope.$watch('watch.polygons', function(newValue, oldValue) {
+        if(newValue) {
+            $scope.showCommunes($scope.communes);
+        } else {
+            $scope.hideCommunes($scope.communes);
+        }
+    });
+
+    $scope.$watch('watch.currentCommune', function(newValue, oldValue) {
+        console.log($scope.currentCommune);
+        if(newValue) {
+            $scope.showCommune($scope.currentCommune, $rootScope.map);
+        } else {
+            $scope.hideCommune($scope.currentCommune);
+        }
+    });
+
+    $scope.$watch('watch.cells', function(newValue, oldValue) {        
+        if(newValue) {
+            $scope.showCells($scope.currentCommune.cells, $rootScope.map);
+        } else {
+            $scope.hideCells($scope.currentCommune.cells);
+        }
+    });
+
+
 });
 

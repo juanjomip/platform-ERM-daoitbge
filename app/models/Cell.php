@@ -29,6 +29,7 @@ class Cell extends Eloquent {
 	// ok
 	public function getData($minDate, $maxDate) {
 		$data = array();
+		$data['id'] = (int) $this->id;
 		$data['measurements'] = $this->measurements($minDate, $maxDate);
 		$data['value'] = $this->summary($minDate, $maxDate);
 		$data['quantity'] = $this->quantity($minDate, $maxDate);			
@@ -47,6 +48,10 @@ class Cell extends Eloquent {
 			->where('date', '>=', $minDate)
 			->where('date', '<=', $maxDate)
 			->get();
+		foreach ($samples as $sample) {
+			$sample->lat = (float) $sample->lat;
+			$sample->lng = (float) $sample->lng;
+		}
 		return array('data' => $samples);
 	}
 
@@ -196,7 +201,7 @@ class Cell extends Eloquent {
 
 	// return all mesasurement
 	public function measurements($minDate, $maxDate) {
-		$cell_measurement = CellMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('cell_id', $this->id)->select('date', 'value');
+		$cell_measurement = CellMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('cell_id', $this->id)->select('date', 'value', 'quantity');
 		$mesaurements = $cell_measurement->get();
 		return $mesaurements;
 	}

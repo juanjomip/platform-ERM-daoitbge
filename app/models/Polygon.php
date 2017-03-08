@@ -11,7 +11,8 @@ class Polygon extends Eloquent {
 	// ok
 	public static function getCommunes($minDate, $maxDate) {
 		$polygons = Polygon::all();
-		foreach ($polygons as $polygon) {		
+		foreach ($polygons as $polygon) {
+			$polygon->id = (int) $polygon->id;
 			$polygon->value = (int) $polygon->summary($minDate, $maxDate);
 			$polygon->quantity = $polygon->quantity($minDate, $maxDate);			
 			$polygon->path = PolygonPath::where('polygon_id', $polygon->id)->get();
@@ -26,6 +27,7 @@ class Polygon extends Eloquent {
 	//ok
 	public function getData($minDate, $maxDate) {
 		$data = array();
+		$data['id'] = (int) $this->id;
 		$data['measurements'] = $this->measurements($minDate, $maxDate);
 		$data['value'] = $this->summary($minDate, $maxDate);
 		$data['quantity'] = $this->quantity($minDate, $maxDate);			

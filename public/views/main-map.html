@@ -28,12 +28,26 @@
 					        	<option value="undefined"  >Todas las comunas</option>
 						        <option value="{{commune.id}}" ng-repeat="commune in communes" >{{commune.name}}</option>					  
 							</select>
-					  	</div-->					
-					    <button ng-click="getPolygons()" type="submit" class="btn btn-default">Todas las comunas</button>
+					  	</div-->					  	
+
+  					    <div ng-if="currentCommune == undefined">	
+  					    	<input ng-model="watch.polygons" type="checkbox" name="vehicle" value="Bike"> Comunas<br>				  	
+  					    </div>
+  					     <div ng-if="currentCommune != undefined">	  					    	
+  					    	<input ng-model="watch.currentCommune" type="checkbox" name="vehicle" value="Bike"> Comuna<br>
+  					    	<input ng-model="watch.cells" type="checkbox" name="vehicle" value="Bike"> Celdas<br> 						  	
+  					    </div>
+  					    <div ng-if="currentCommune.currentCell != undefined">	  					    	
+  					    	<input ng-model="watch.samples" type="checkbox" name="vehicle" value="Bike"> Muestras<br>  					    							  	
+  					    </div>
+
+					    <button ng-if="!showPolygonList" ng-click="getPolygons()" type="submit" class="btn btn-default">Atrás</button>					    
+					    
 					</form>               
-				</div>				
+				</div>		
+					
 				<div style="margin-top:20px; height: 600px; overflow-y:auto;" class="col-lg-12 col-md-12 col-sm-12">
-	                <table  class="table" ng-if="currentCommune == undefined" >
+	                <table  class="table" ng-if="showPolygonList" >
 						<tr >
 						    <th>Comuna</th>
 						    <th>Medición</th> 
@@ -46,16 +60,41 @@
 
 					  	</tr>	  	
 					</table>
-					<table  class="table" ng-if="queryData.commune_id != undefined || queryData.commune_id == 'undefined'" >
+					<!--label ng-if="currentCommune != undefined" >Lista de mediciones</label-->
+					<!--table  class="table" ng-if="currentCommune != undefined " >
 						<tr >
 						    <th>Fecha</th>
 						    <th>Medición</th> 
 						    <th>Muestras</th>
 			 		    </tr>
-					  	<tr ng-repeat="commune_measurement in commune.measurements">
-						    <td>{{commune_measurement.date}} </td>
-						    <td>{{commune_measurement.value}}</td> 
-						    <td>{{commune_measurement.quantity}}</td>
+					  	<tr ng-repeat="measurement in currentCommune.measurements">
+						    <td>{{measurement.date}} </td>
+						    <td>{{measurement.value}}</td> 
+						    <td>{{measurement.quantity}}</td>
+					  	</tr>
+					</table-->
+					<label ng-if="currentCommune != undefined && currentCommune.currentCell == undefined" >Lista de celdas</label>
+					<table  class="table" ng-if="currentCommune != undefined && currentCommune.currentCell == undefined" >
+						<tr >						   
+						    <th>Medición</th> 
+						    <th>Muestras</th>
+			 		    </tr>
+					  	<tr ng-repeat="cell in currentCommune.cells" ng-click="getCell(cell.id)">						    
+						    <td>{{cell.value}}</td> 
+						    <td>{{cell.quantity}}</td>
+					  	</tr>
+					</table>
+					<label ng-if="currentCommune.currentCell != undefined" >Lista de muestras</label>
+					<table  class="table" ng-if="currentCommune.currentCell != undefined"  >
+						<tr >	
+							<th>Fecha</th>					   
+						    <th>Medición</th> 
+						   
+			 		    </tr>
+					  	<tr ng-repeat="sample in currentCommune.currentCell.samples" >	
+					  		<td>{{sample.date}}</td>    
+						    <td>{{sample.value}}</td> 
+						    
 					  	</tr>
 					</table>
 
@@ -70,7 +109,7 @@
 	                             
 	            </div>
 	            <div style="margin-top:20px; class="col-lg-12 col-md-12 col-sm-12">                
-                       <label >{{queryResult.commune_name}} </label> <label >desde </label>  {{queryResult.minDate}}&nbsp;<label >hasta </label> {{queryResult.maxDate}}&nbsp;
+                       <label >{{currentCommunecommune_name}} </label> <label >desde </label>  {{queryResult.minDate}}&nbsp;<label >hasta </label> {{queryResult.maxDate}}&nbsp;
             	</div>
 
             	{{queryData}}
