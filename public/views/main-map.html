@@ -3,12 +3,11 @@
 
 	<div style="background:white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);" class="container" style=" height: 100%;"">
 		<div class="row text-center" style=" height: 10%; " > 
-			<h1>Monitoreo de Radiación Electromagnética</h1>
+			<h1>Monitoreo de Radiación Electromagnética </h1>
 		</div>
         <div class="row" style=" height: 90%; " >     
             
             <!-- Barra lateral izquierda -->
-
             <div style=" height: 100%; " class="col-lg-4 col-md-4 col-sm-4">                
 				<div class="col-lg-12 col-md-12 col-sm-12">              
 	                <form>	                	
@@ -28,70 +27,69 @@
 					        	<option value="undefined"  >Todas las comunas</option>
 						        <option value="{{commune.id}}" ng-repeat="commune in communes" >{{commune.name}}</option>					  
 							</select>
-					  	</div-->					  	
+					  	</div-->	
 
-  					    <div ng-if="currentCommune == undefined">	
+  					    <div ng-if="pageStatus == 'polygons'">	
   					    	<input ng-model="watch.polygons" type="checkbox" name="vehicle" value="Bike"> Comunas<br>				  	
   					    </div>
-  					     <div ng-if="currentCommune != undefined">	  					    	
-  					    	<input ng-model="watch.currentCommune" type="checkbox" name="vehicle" value="Bike"> Comuna<br>
-  					    	<input ng-model="watch.cells" type="checkbox" name="vehicle" value="Bike"> Celdas<br> 						  	
+  					    <div ng-if="pageStatus == 'cells' || pageStatus == 'samples'">	
+  					    	<input ng-model="watch.polygon" type="checkbox" name="vehicle" value="Bike"> Comuna<br>				  	
   					    </div>
-  					    <div ng-if="currentCommune.currentCell != undefined">	  					    	
-  					    	<input ng-model="watch.samples" type="checkbox" name="vehicle" value="Bike"> Muestras<br>  					    							  	
+  					    <div ng-if="pageStatus == 'cells'">	
+  					    	<input ng-model="watch.cells" type="checkbox" name="vehicle" value="Bike"> Celdas<br>				  	
   					    </div>
+  					    <div ng-if="pageStatus == 'samples'">	
+  					    	<input ng-model="watch.cell" type="checkbox" name="vehicle" value="Bike"> Celda<br>				  	
+  					    </div>
+  					    <div ng-if="pageStatus == 'samples'">	
+  					    	<input ng-model="watch.samples" type="checkbox" name="vehicle" value="Bike"> Muestras<br>				  	
+  					    </div> 					    				  	
+  					     					     
 
-					    <button ng-if="!showPolygonList" ng-click="getPolygons()" type="submit" class="btn btn-default">Atrás</button>					    
+					    <button ng-if="!showPolygonList" ng-click="getPolygons()" type="submit" class="btn btn-default">Atrás</button>    
 					    
 					</form>               
 				</div>		
 					
-				<div style="margin-top:20px; height: 600px; overflow-y:auto;" class="col-lg-12 col-md-12 col-sm-12">
-	                <table  class="table" ng-if="showPolygonList" >
+				<div style="margin-top:20px; height: 600px; overflow-y:auto;" class="col-lg-12 col-md-12 col-sm-12">	                
+	               
+	                <!-- POLYGONS TABLE-->
+	                <label ng-if="polygonsList()" >Lista de comunas</label>	                
+	                <table ng-if="polygonsList()" class="table">
 						<tr >
 						    <th>Comuna</th>
 						    <th>Medición</th> 
 						    <th>Muestras</th>
 					 	</tr>
-					  	<tr ng-click="getPolygon(commune.id)" ng-repeat="commune in communes">
-						    <td>{{commune.name}} </td>
-						    <td>{{commune.value}}</td> 
-						    <td>{{commune.quantity}}</td>
+					  	<tr ng-click="getPolygon(polygon.id)" ng-repeat="polygon in polygons">
+						    <td>{{polygon.name}} </td>
+						    <td>{{polygon.value}}</td> 
+						    <td>{{polygon.quantity}}</td>
+					  	</tr>						  	  	
+					</table>						
 
-					  	</tr>	  	
-					</table>
-					<!--label ng-if="currentCommune != undefined" >Lista de mediciones</label-->
-					<!--table  class="table" ng-if="currentCommune != undefined " >
-						<tr >
-						    <th>Fecha</th>
-						    <th>Medición</th> 
-						    <th>Muestras</th>
-			 		    </tr>
-					  	<tr ng-repeat="measurement in currentCommune.measurements">
-						    <td>{{measurement.date}} </td>
-						    <td>{{measurement.value}}</td> 
-						    <td>{{measurement.quantity}}</td>
-					  	</tr>
-					</table-->
-					<label ng-if="currentCommune != undefined && currentCommune.currentCell == undefined" >Lista de celdas</label>
-					<table  class="table" ng-if="currentCommune != undefined && currentCommune.currentCell == undefined" >
+					<!-- CELLS TABLE-->				
+					<label ng-if="cellsList()" >Lista de celdas</label>
+					<table ng-if="cellsList()" class="table">
 						<tr >						   
 						    <th>Medición</th> 
 						    <th>Muestras</th>
 			 		    </tr>
-					  	<tr ng-repeat="cell in currentCommune.cells" ng-click="getCell(cell.id)">						    
+					  	<tr ng-repeat="cell in cells" ng-click="getCell(cell.id)">						    
 						    <td>{{cell.value}}</td> 
 						    <td>{{cell.quantity}}</td>
 					  	</tr>
 					</table>
-					<label ng-if="currentCommune.currentCell != undefined" >Lista de muestras</label>
-					<table  class="table" ng-if="currentCommune.currentCell != undefined"  >
+
+					<!-- SAMPLES TABLE-->
+					<label ng-if="samplesList()">Lista de muestras</label>
+					<table ng-if="samplesList()"  class="table" >
 						<tr >	
 							<th>Fecha</th>					   
 						    <th>Medición</th> 
 						   
 			 		    </tr>
-					  	<tr ng-repeat="sample in currentCommune.currentCell.samples" >	
+					  	<tr ng-repeat="sample in samples" >	
 					  		<td>{{sample.date}}</td>    
 						    <td>{{sample.value}}</td> 
 						    
@@ -109,10 +107,9 @@
 	                             
 	            </div>
 	            <div style="margin-top:20px; class="col-lg-12 col-md-12 col-sm-12">                
-                       <label >{{currentCommunecommune_name}} </label> <label >desde </label>  {{queryResult.minDate}}&nbsp;<label >hasta </label> {{queryResult.maxDate}}&nbsp;
-            	</div>
-
-            	{{queryData}}
+                      
+            	</div>            	
+            	
         	</div>    
     	</div>
     </div>
