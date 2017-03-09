@@ -439,7 +439,7 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         $http.get('/api/polygon/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + id)
             .then(function(response) {
                 $scope.polygon = response.data.data;
-                $scope.drawCommune($scope.polygon);
+                $scope.drawCommune($scope.polygon);                
                 $scope.watch.polygon = true;
                 $scope.watch.polygons = false;
                 $scope.panToPolygon($scope.polygon.path);
@@ -456,7 +456,10 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         $http.get('/api/cells/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + id)
             .then(function(response) {         
                 $scope.cells = response.data.data;               
-                $scope.drawCells($scope.cells);                
+                $scope.drawCells($scope.cells);  
+                if($scope.watch.cells) {
+                    $scope.showCells($scope.cells);
+                }              
                 $scope.watch.cells = true;                         
             },
             function error(response) {
