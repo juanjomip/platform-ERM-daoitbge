@@ -201,7 +201,7 @@ class Cell extends Eloquent {
 
 	// return all mesasurement
 	public function measurements($minDate, $maxDate) {
-		$cell_measurement = CellMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('cell_id', $this->id)->select('date', 'value', 'quantity');
+		$cell_measurement = CellMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('cell_id', $this->id)->select('date', 'value', 'quantity')->orderBy('date', 'ASC');
 		$mesaurements = $cell_measurement->get();
 		return $mesaurements;
 	}

@@ -28,6 +28,7 @@ class Polygon extends Eloquent {
 	public function getData($minDate, $maxDate) {
 		$data = array();
 		$data['id'] = (int) $this->id;
+		$data['name'] = $this->name;
 		$data['measurements'] = $this->measurements($minDate, $maxDate);
 		$data['value'] = $this->summary($minDate, $maxDate);
 		$data['quantity'] = $this->quantity($minDate, $maxDate);			
@@ -147,7 +148,7 @@ class Polygon extends Eloquent {
 
 	// return all mesasurement
 	public function measurements($minDate, $maxDate) {
-		$cell_measurement = PolygonMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('polygon_id', $this->id)->select('date', 'value', 'quantity');
+		$cell_measurement = PolygonMeasurement::where('date', '>=', $minDate)->where('date', '<=', $maxDate)->where('polygon_id', $this->id)->select('date', 'value', 'quantity')->orderBy('date', 'ASC');
 		$mesaurements = $cell_measurement->get();
 		return $mesaurements;
 	}
