@@ -10,6 +10,12 @@ class ApiController extends BaseController {
 		$newValue = (($a*$b) + $c ) / $a + 1;
 		return $newValue;
 		
+	}
+
+	public function getReport($type = null, $minDate = null, $maxDate = null, $polygon_id = null) {		
+		$data = array('type' => $type, 'minDate' => $minDate, 'maxDate' => $maxDate, 'polygonId' => $polygon_id);
+		$report = new ExcelReport();		
+		return $report->make($data);
 	}	
 
 	// Main Querys *******************************************************************************************************//

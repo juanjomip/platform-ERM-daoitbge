@@ -5,7 +5,8 @@
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.2.*",
-		"php-coord/php-coord": "^2.0"
+		"php-coord/php-coord": "^2.0",
+		"phpoffice/phpexcel": "dev-master"
 	},
 	"autoload": {
 		"classmap": [

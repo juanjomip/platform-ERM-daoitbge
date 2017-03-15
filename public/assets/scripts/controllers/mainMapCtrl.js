@@ -536,6 +536,17 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         );         
     }
 
+    $scope.getReport = function() {
+        $http.get('/api/report/' + $scope.pageStatus + '/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + $scope.polygon.id)
+            .then(function(response) {  
+                console.log(response);                                      
+            },
+            function error(response) {
+                console.log(response);
+            }
+        );       
+    }
+
     $scope.updateChart = function(data) {        
         $scope.attrs.caption = '';          
         $scope.dataset = [{"seriesname": "","data": []}];

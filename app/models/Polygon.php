@@ -7,6 +7,19 @@ class Polygon extends Eloquent {
 	
 	protected $table = 'polygon';
 
+	public static function polygonsReport($data) {
+		$minDate = $data['minDate'];
+		$maxDate = $data['maxDate'];
+		$polygons = Polygon::all();
+		foreach ($polygons as $polygon) {
+			$polygon->id = (int) $polygon->id;
+			$polygon->value = (int) $polygon->summary($minDate, $maxDate);
+			$polygon->quantity = $polygon->quantity($minDate, $maxDate);	
+		}		
+		$sheet = ExcelReport::createSheet('Comunas', $polygons);
+		return array($sheet);
+	}
+
 	// Query methods ********************************************************************************************************************** //
 	// ok
 	public static function getCommunes($minDate, $maxDate) {
