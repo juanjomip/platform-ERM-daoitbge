@@ -149,7 +149,9 @@ class Cell extends Eloquent {
 					'value' => $newValue,
 					'quantity' => $cellMeasurement->quantity
 				)
-			);			
+			);	
+			// get again current measure.
+			$cellMeasurement = CellMeasurement::where('date', $sample->date)->where('cell_id', $this->id)->first();		
 		} else {
 			$cellMeasurement = new CellMeasurement();
 			$cellMeasurement->cell_id = $this->id;
@@ -158,14 +160,14 @@ class Cell extends Eloquent {
 			$cellMeasurement->quantity = 1;
 			$cellMeasurement->save();						
 		}
-		$this->updatePolygons($cellMeasurement);
+		$this->updatePolygons($cellMeasurement, $sample->value);
 	}
 
-	public function updatePolygons($cellMeasurement) {
+	public function updatePolygons($cellMeasurement, $value) {
 		$polygons = Polygon::select('polygon.id')->join('cell_polygon', 'cell_polygon.polygon_id', '=', 'polygon.id')->where('cell_polygon.cell_id', $this->id)->get();
 		foreach ($polygons as $polygon) {
 			$polyg = Polygon::find($polygon->id);
-			$polyg->updateMeasurement($cellMeasurement);
+			$polyg->updateMeasurement($cellMeasurement, $value);
 		}
 	}
 
