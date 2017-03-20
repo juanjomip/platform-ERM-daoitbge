@@ -20,6 +20,22 @@ class Polygon extends Eloquent {
 		return array($sheet);
 	}
 
+	public static function polygonReport($data) {
+		$polygon = Polygon::find($data['polygonId']);
+		$minDate = $data['minDate'];
+		$maxDate = $data['maxDate'];
+		// Measurement sheet		
+		$measurement_sheet = ExcelReport::createSheet('Histórico', $polygon->measurements($minDate, $maxDate));
+		// Cell Sheet
+		$cells = Cell::join('cell_polygon', 'cell_polygon.cell_id', '=', 'cell.id')->where('cell_polygon.polygon_id', $polygon->id)->get();
+		foreach ($cells as $cell) {
+			$cell->value = $cell->summary($minDate, $maxDate);
+			$cell->quantity = $cell->quantity($minDate, $maxDate);						
+		}
+		$cells_sheet = ExcelReport::createSheet('Celdas', $cells);
+		return array($measurement_sheet, $cells_sheet);		
+	}
+
 	// Query methods ********************************************************************************************************************** //
 	// ok
 	public static function getCommunes($minDate, $maxDate) {
@@ -56,7 +72,9 @@ class Polygon extends Eloquent {
 
 	//ok
 	public function getCells($minDate, $maxDate) {
-		$cells = Cell::join('cell_polygon', 'cell_polygon.cell_id', '=', 'cell.id')->where('cell_polygon.polygon_id', $this->id)->get();
+		$cells = Cell::select(
+			'cell.id as id')
+		->join('cell_polygon', 'cell_polygon.cell_id', '=', 'cell.id')->where('cell_polygon.polygon_id', $this->id)->get();
 		foreach ($cells as $cell) {
 			$cell->value = $cell->summary($minDate, $maxDate);
 			$cell->quantity = $cell->quantity($minDate, $maxDate);

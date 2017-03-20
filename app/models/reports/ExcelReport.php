@@ -23,8 +23,7 @@ class ExcelReport extends Report {
 
 	public function make($data)
     {      	
-    	$this->sheets = $this->getData($data);  
-    	
+    	$this->sheets = $this->getData($data);   	
 
         require_once base_path().'/vendor/phpoffice/phpexcel/Classes/PHPExcel/IOFactory.php';        
         $excel = new PHPExcel();

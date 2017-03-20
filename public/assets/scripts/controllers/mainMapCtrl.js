@@ -474,7 +474,8 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
 
     $scope.getCells = function (id) {        
         $http.get('/api/cells/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + id)
-            .then(function(response) {               
+            .then(function(response) {
+                console.log(response);            
 
                 $scope.cells = response.data.data;               
                 $scope.drawCells($scope.cells);  
@@ -537,14 +538,30 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     }
 
     $scope.getReport = function() {
-        $http.get('/api/report/' + $scope.pageStatus + '/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + $scope.polygon.id)
+        /*$http.get('/api/report/' + $scope.pageStatus + '/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + $scope.polygon.id)
             .then(function(response) {  
                 console.log(response);                                      
             },
             function error(response) {
                 console.log(response);
             }
-        );       
+        ); */
+
+        $http({
+            method: 'GET',
+            url: '/api/report/' + $scope.pageStatus + '/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + $scope.polygon.id  + '/' + $scope.cell.id,
+            headers: {'Content-Type': 'application/json'},
+            responseType: 'arraybuffer'               
+        }).then(function(response) {  
+            console.log(response);
+            var blob = new Blob([response.data], {
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8"
+            });
+            saveAs(blob, "Reporte.xlsx");                                                 
+        },
+        function error(response) {
+            console.log(response);
+        }); 
     }
 
     $scope.updateChart = function(data) {        

@@ -25,6 +25,25 @@ class Cell extends Eloquent {
 		'bottom_right_lng'
 	);
 
+	public static function cellReport($data) {
+		$cell = Cell::find($data['cellId']);
+		$minDate = $data['minDate'];
+		$maxDate = $data['maxDate'];
+		// Measurement sheet		
+		$measurement_sheet = ExcelReport::createSheet('Histórico', $cell->measurements($minDate, $maxDate));
+		// Cell Sheet
+		$samples = UnprocessedSample::where('cell_id', $cell->id)
+			->where('date', '>=', $minDate)
+			->where('date', '<=', $maxDate)
+			->get();
+		foreach ($samples as $sample) {
+			$sample->lat = (float) $sample->lat;
+			$sample->lng = (float) $sample->lng;
+		}
+		$samples_sheet = ExcelReport::createSheet('Muestras', $samples);
+		return array($measurement_sheet, $samples_sheet);	
+	}
+
 	// Query methods ********************************************************************************************************************** //
 	// ok
 	public function getData($minDate, $maxDate) {
@@ -102,6 +121,14 @@ class Cell extends Eloquent {
 		$this->setTopLeft();
 		$this->setTopRight();
 		$this->setBootmRight();
+		//unset($this->bottom_right_lat);
+		//unset($this->bottom_right_lng);
+		//unset($this->top_right_lat);
+		//unset($this->top_right_lng);
+		//unset($this->top_left_lng);
+		//unset($this->top_left_lat);
+		//unset($this->bottom_left_lng);
+		//unset($this->bottom_left_lat);
 	}
 
 	private function setCenter() {

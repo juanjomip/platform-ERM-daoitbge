@@ -12,8 +12,8 @@ class ApiController extends BaseController {
 		
 	}
 
-	public function getReport($type = null, $minDate = null, $maxDate = null, $polygon_id = null) {		
-		$data = array('type' => $type, 'minDate' => $minDate, 'maxDate' => $maxDate, 'polygonId' => $polygon_id);
+	public function getReport($type = null, $minDate = null, $maxDate = null, $polygon_id = null, $cell_id = null) {		
+		$data = array('type' => $type, 'minDate' => $minDate, 'maxDate' => $maxDate, 'polygonId' => $polygon_id, 'cellId' => $cell_id);
 		$report = new ExcelReport();		
 		return $report->make($data);
 	}	

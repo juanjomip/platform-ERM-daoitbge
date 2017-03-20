@@ -16,9 +16,11 @@ class Report{
                 $sheets = Polygon::polygonsReport($data);
                 break;
             case 'cells':
+                $sheets = Polygon::polygonReport($data);
                 //$data = Polygon::polygonReport($data);
                 break;
             case 'samples':
+                $sheets = Cell::cellReport($data);
                 //$data = Cell::cellReport($data);
                 break;
             default:
