@@ -90,7 +90,7 @@ class ExcelReport extends Report {
         header('Content-Transfer-Encoding: binary');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');       
-        $objWriter->save('app/storage/reports/excels/ex.xlsx');
+        //$objWriter->save('app/storage/reports/excels/ex.xlsx');
         $objWriter->save('php://output');
         die;
     }
