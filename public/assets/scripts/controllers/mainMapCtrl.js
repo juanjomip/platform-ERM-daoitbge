@@ -2,6 +2,9 @@
 
 app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     
+    // Admin
+    $scope.admin = false;
+
     // Dates for Querys
     $scope.queryData = {
         'maxDate':'2017-12-31',
@@ -538,15 +541,6 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
     }
 
     $scope.getReport = function() {
-        /*$http.get('/api/report/' + $scope.pageStatus + '/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + $scope.polygon.id)
-            .then(function(response) {  
-                console.log(response);                                      
-            },
-            function error(response) {
-                console.log(response);
-            }
-        ); */
-
         $http({
             method: 'GET',
             url: '/api/report/' + $scope.pageStatus + '/' + $scope.queryData.minDate  + '/' + $scope.queryData.maxDate + '/' + $scope.polygon.id  + '/' + $scope.cell.id,
@@ -598,6 +592,18 @@ app.controller('mainMapCtrl', function ($rootScope, $scope, $http, $state) {
         } else {
             console.log('do nothing');
         }
+    }
+
+    $scope.adminAuth = function (id) {               
+        $http.get('/api/adminauth')
+            .then(function(response) {                         
+                if(response.data.status == 'success')
+                    $scope.admin = true;                             
+            },
+            function error(response) {
+                console.log(response);
+            }
+        );         
     }
 
     // Init Functions.

@@ -16,6 +16,7 @@ class TableUnprocessedsample extends Migration {
             $table->engine = 'InnoDB';
             $table->increments('id');
             $table->string('username');
+            $table->string('email');
             $table->string('password');
             $table->decimal('lat', 10, 7);
             $table->decimal('lng', 10, 7);                      
@@ -133,6 +134,14 @@ class TableUnprocessedsample extends Migration {
         // Start Seed.
 
         Polygon::santiagoFromKml();
+
+        DB::table('user')->insert(
+            array(
+                'username' => 'adminunab',
+                'email' => 'admin@unab.cl',
+                'password' => Hash::make('profepongameunsiete')
+            )
+        );
 
         /*$paths = CommunePath::all();
         foreach ($paths as $path) {

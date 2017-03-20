@@ -2,6 +2,16 @@
 
 class ApiController extends BaseController {	
 
+	public function __construct() {  
+		Config::set('auth.model', 'User');        
+        $this->beforeFilter('auth.basic', array('only' => array('getAdminauth', 'getReport')));
+        //$this->user = Auth::user();       
+    }
+
+    public function getAdminauth() {
+    	return array('status' => 'success');
+    }
+
 	public function getIndex()
 	{
 		$a = 9;
