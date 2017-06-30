@@ -146,6 +146,36 @@ class ApiController extends BaseController {
 		return array('status' => 'success');
 	}
 
+	public function getSavesamples($samples) {
+		$samples_string = $samples;
+		$samples = explode("||", $samples_string);
+
+		foreach ($samples as $sample) {
+			$params = explode("|", $sample);
+
+			$sample_obj = new UnprocessedSample();
+			$sample_obj->lat = $params[0];
+			$sample_obj->lng = $params[1];
+			$sample_obj->date = $params[2];
+			$sample_obj->value = $params[3];
+			$sample_obj->assignCell();
+		}
+		return 'ok';
+	}
+
+	public function postSavesamples() {
+		$input = Input::all();
+		$samples = $input['samples'];
+		foreach ($samples as $sample) {
+			$sample_obj = new UnprocessedSample();
+			$sample_obj->lat = $sample['lat'];
+			$sample_obj->lng = $sample['lng'];
+			$sample_obj->date = $sample['date'];
+			$sample_obj->value = $sample['value'];
+			$sample_obj->assignCell();
+		}
+		return 'ok';
+	}
 
 	public function getSample($lat, $lng, $date, $value){
 		$sample = new UnprocessedSample();
