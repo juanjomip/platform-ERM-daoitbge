@@ -160,11 +160,17 @@ class TableUnprocessedsample extends Migration {
 	 */
 	public function down()
 	{
-        Schema::drop('cell_commune');
-        Schema::drop('commune_path');
-        Schema::drop('commune');
+        Schema::drop('sensitive_area_measurement');
+        Schema::drop('polygon_measurement');
+        Schema::drop('cell_measurement');
+        Schema::drop('cell_polygon');
+        Schema::drop('sensitive_area');
+        Schema::drop('polygon_path');
+        Schema::drop('polygon');
+        Schema::drop('cell_path');
         Schema::drop('cell');
-		Schema::drop('unprocessed_sample');
+        Schema::drop('unprocessed_sample');
+        Schema::drop('user');       
 	}
 
 }

@@ -161,6 +161,7 @@ class ApiController extends BaseController {
 			$sample_obj->assignCell();
 		}
 		return 'ok';
+		//http://104.236.92.253/api/savesamples/-33.4888092|-70.6666941|2017-07-19|16
 	}
 
 	public function postSavesamples() {
