@@ -1,4 +1,5 @@
 <?php
+use Carbon;
 
 class ApiController extends BaseController {	
 
@@ -156,7 +157,12 @@ class ApiController extends BaseController {
 			$sample_obj = new UnprocessedSample();
 			$sample_obj->lat = $params[0];
 			$sample_obj->lng = $params[1];
-			$sample_obj->date = $params[2];
+			
+			$timestamp = $params[2];
+			$carbon = Carbon::createFromTimestamp($timestamp);
+			$datetime = $carbon->toDateString();
+			$sample_obj->date = $datetime;			
+
 			$sample_obj->value = $params[3];
 			$sample_obj->assignCell();
 		}
