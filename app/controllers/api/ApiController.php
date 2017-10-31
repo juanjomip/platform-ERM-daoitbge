@@ -1,5 +1,5 @@
 <?php
-use Carbon;
+use Carbon\Carbon;
 
 class ApiController extends BaseController {	
 
