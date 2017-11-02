@@ -14,12 +14,15 @@ class UNprocessedSample extends Eloquent {
 		if($cell = Cell::where('lat_index', $lat_index)->where('lng_index', $lng_index)->first()) {
 			$this->cell_id = $cell->id;
 			$this->save();
-			$cell->updateMeasurement($this);
+
+			$sample = UNprocessedSample::find($this->id);
+			$cell->updateMeasurement($sample);
 		} else {
 			$cell = Cell::createAndConfig($lat_index, $lng_index);
 			$this->cell_id = $cell->id;
 			$this->save();
-			$cell->updateMeasurement($this);
+			$sample = UNprocessedSample::find($this->id);
+			$cell->updateMeasurement($sample);
 		}
 	}
 }
